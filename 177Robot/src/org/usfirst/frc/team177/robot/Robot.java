@@ -32,10 +32,9 @@ public class Robot extends IterativeRobot {
     private static final int shiftButton = 3; //Right Joystick button 3 is the shifter
 
     /** Left Joystick Buttons **/
-    private static final int casterButton = 3; //Left Joystick button 3 is the caster
+    
     /* Solenoids */
     private static final int SolenoidDriveShifter = 0;
-    private static final int SolenoidCasters = 1;
     
     /* Motor Controllers */
     Victor rearLeftMotor = new Victor(MotorDriveRL);
@@ -53,9 +52,8 @@ public class Robot extends IterativeRobot {
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
     
-    /* Pneumatics */ 
+    /* Pnumatics */ 
     Solenoid shifter = new Solenoid(SolenoidDriveShifter);
-    Solenoid caster = new Solenoid(SolenoidCasters);
     
     /**
      * This function is run when the robot is first started up and should be
@@ -89,7 +87,6 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
     	drive.tankDrive(leftStick, rightStick); // drive with the joysticks 
     	shifter.set(rightStick.getRawButton(shiftButton));
-    	caster.set(leftStick.getRawButton(casterButton));
     	
     	SmartDashboard.putNumber("J1.X",  leftStick.getAxis(AxisType.kX));
     	SmartDashboard.putNumber("J1.Y",  leftStick.getAxis(AxisType.kY));
