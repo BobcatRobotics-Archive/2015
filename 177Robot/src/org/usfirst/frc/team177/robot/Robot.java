@@ -115,7 +115,8 @@ public class Robot extends IterativeRobot {
     	if (DriveMode == 0) {
     		if(Math.abs(leftStick.getRawAxis(axisX)) > Math.abs(leftStick.getRawAxis(axisY))) {
         		slideMotor.set(leftStick.getRawAxis(axisX));
-        		drive.tankDrive(0, 0);
+        		drive.tankDrive(-1.0 * rightStick.getRawAxis(axisX),(rightStick.getRawAxis(axisX)));
+        		//drive.tankDrive(0, 0);
         	} else {
         		drive.tankDrive(leftStick.getRawAxis(axisY), leftStick.getRawAxis(axisY)); //Left, Right side
         		slideMotor.set(0);
