@@ -109,28 +109,32 @@ public class Robot extends IterativeRobot {
     	/*Drive Modes
     	 * 0:Slide Drive
     	 * 1:Tank Drive
+    	 * 2:Controller Slide Drive
     	 */
-    	final int DriveMode = 1;
+    	final int DriveMode = 0;
     	
     	if (DriveMode == 0) {
-    		if(Math.abs(leftStick.getRawAxis(axisX)) > Math.abs(leftStick.getRawAxis(axisY))) {
-        		slideMotor.set(leftStick.getRawAxis(axisX));
-        		drive.tankDrive(-1.0 * rightStick.getRawAxis(axisX),(rightStick.getRawAxis(axisX)));
-        		//drive.tankDrive(0, 0);
-        	} else {
-        		drive.tankDrive(leftStick.getRawAxis(axisY), leftStick.getRawAxis(axisY)); //Left, Right side
-        		slideMotor.set(0);
-        	} 
+    		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
+    		double right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
+    		if (left > right) {
+    			if (left > 1) {
+    				double scale = 1 / left;
+    				left = scale * left;
+    				right = scale * right;
+    			} 
+    		} else {
+    			if (right > 1) {
+    				double scale = 1 / right;
+    				left = scale * left;
+    				right = scale * right;
+    			}
+    		}
+    		drive.tankDrive(left, right);
+    		slideMotor.set(leftStick.getRawAxis(axisX));
+    		
     	} else if (DriveMode == 1){
     		drive.tankDrive(leftStick, rightStick);
     	}
-    	
-    	
-    	
-    	SmartDashboard.putNumber("J1.X",  leftStick.getAxis(AxisType.kX));
-    	SmartDashboard.putNumber("J1.Y",  leftStick.getAxis(AxisType.kY));
-    	SmartDashboard.putNumber("J2.X", rightStick.getAxis(AxisType.kX));
-    	SmartDashboard.putNumber("J2.Y", rightStick.getAxis(AxisType.kY));
     }
     
     /**
