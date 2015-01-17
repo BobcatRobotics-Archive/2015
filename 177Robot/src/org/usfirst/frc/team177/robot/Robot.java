@@ -110,8 +110,9 @@ public class Robot extends IterativeRobot {
     	 * 0:Slide Drive
     	 * 1:Tank Drive
     	 * 2:Controller Slide Drive
+    	 * 3:Controller Tank Drive
     	 */
-    	final int DriveMode = 0;
+    	final int DriveMode = 3;
     	
     	if (DriveMode == 0) {
     		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
@@ -132,8 +133,29 @@ public class Robot extends IterativeRobot {
     		drive.tankDrive(left, right);
     		slideMotor.set(leftStick.getRawAxis(axisX));
     		
-    	} else if (DriveMode == 1){
+    	} else if (DriveMode == 1) {
     		drive.tankDrive(leftStick, rightStick);
+    	} else if (DriveMode == 2) {
+    		shifter.set(operatorStick.getRawButton(6));
+    		double left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
+    		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
+    		if (left > right) {
+    			if (left > 1) {
+    				double scale = 1 / left;
+    				left = scale * left;
+    				right = scale * right;
+    			} 
+    		} else {
+    			if (right > 1) {
+    				double scale = 1 / right;
+    				left = scale * left;
+    				right = scale * right;
+    			}
+    		}
+        	drive.tankDrive(left, right);
+        	slideMotor.set(leftStick.getRawAxis(axisX));
+    	} else if (DriveMode == 3) {
+    		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
     	}
     }
     
