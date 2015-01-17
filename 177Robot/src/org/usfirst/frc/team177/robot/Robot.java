@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Joystick.AxisType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Encoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,14 +27,25 @@ public class Robot extends IterativeRobot {
     
     private static final int MotorDriveRR = 2;
     private static final int MotorDriveMR = 4;
-    private static final int MotorDriveFR = 6;  
+    private static final int MotorDriveFR = 6;
     
+    private static final int MotorSlide = 7;
+    
+    /* Joystick Constants */ //Magic Numbers found in Joystick.class
+    private static final int axisX = 0;
+    private static final int axisY = 1;
+    
+    /** Digital IO */
+    private static final int DIOLeftEncoderA = 0;
+    private static final int DIOLeftEncoderB = 1;
+    private static final int DIORightEncoderA = 2;
+    private static final int DIORightEncoderB = 3;
     /** Right Joystick Buttons **/
     private static final int shiftButton = 3; //Right Joystick button 3 is the shifter
 
     /** Left Joystick Buttons **/
-    private static final int casterButton = 3; //Left Joystick button 3 is the caster
-    /* Solenoids */
+    private static final int casterButton = 3; //Left Joystick button 3 is the caster 
+    
     private static final int SolenoidDriveShifter = 0;
     private static final int SolenoidCasters = 1;
     
@@ -44,10 +56,12 @@ public class Robot extends IterativeRobot {
     
     Victor rearRightMotor = new Victor(MotorDriveRR);
     Victor midRightMotor = new Victor(MotorDriveMR); 
-    Victor frontRightMotor = new Victor(MotorDriveFR);           
+    Victor frontRightMotor = new Victor(MotorDriveFR);
+    
+    Victor slideMotor = new Victor(MotorSlide);
     
     RobotDrive6 drive = new RobotDrive6(frontLeftMotor, midLeftMotor, rearLeftMotor, frontRightMotor, midRightMotor, rearRightMotor);
-
+    
     /* Instantiate Joysticks */
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
@@ -86,10 +100,31 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during operator control
      */
-    public void teleopPeriodic() {
-    	drive.tankDrive(leftStick, rightStick); // drive with the joysticks 
+    @SuppressWarnings("unused")
+	public void teleopPeriodic() {
+    	
     	shifter.set(rightStick.getRawButton(shiftButton));
     	caster.set(leftStick.getRawButton(casterButton));
+    	
+    	/*Drive Modes
+    	 * 0:Slide Drive
+    	 * 1:Tank Drive
+    	 */
+    	final int DriveMode = 1;
+    	
+    	if (DriveMode == 0) {
+    		if(Math.abs(leftStick.getRawAxis(axisX)) > Math.abs(leftStick.getRawAxis(axisY))) {
+        		slideMotor.set(leftStick.getRawAxis(axisX));
+        		drive.tankDrive(0, 0);
+        	} else {
+        		drive.tankDrive(leftStick.getRawAxis(axisY), leftStick.getRawAxis(axisY)); //Left, Right side
+        		slideMotor.set(0);
+        	} 
+    	} else if (DriveMode == 1){
+    		drive.tankDrive(leftStick, rightStick);
+    	}
+    	
+    	
     	
     	SmartDashboard.putNumber("J1.X",  leftStick.getAxis(AxisType.kX));
     	SmartDashboard.putNumber("J1.Y",  leftStick.getAxis(AxisType.kY));
