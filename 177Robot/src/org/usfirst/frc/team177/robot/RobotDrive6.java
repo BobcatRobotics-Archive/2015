@@ -472,7 +472,7 @@ public class RobotDrive6 implements MotorSafety {
             UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(), tInstances.kRobotDrive_MecanumPolar);
             kMecanumPolar_Reported = true;
         }
-        double frontLeftSpeed, rearLeftSpeed, frontRightSpeed, rearRightSpeed;
+        //double frontLeftSpeed, rearLeftSpeed, frontRightSpeed, rearRightSpeed;
         // Normalized for full power along the Cartesian axes.
         magnitude = limit(magnitude) * Math.sqrt(2.0);
         // The rollers are at 45 degree angles.
