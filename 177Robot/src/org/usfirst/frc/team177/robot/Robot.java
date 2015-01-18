@@ -49,6 +49,11 @@ public class Robot extends IterativeRobot {
     private static final int SolenoidDriveShifter = 0;
     private static final int SolenoidCasters = 1;
     
+    /** Launchpad Switches **/
+    private static final int leftSwitch = 13;
+    private static final int middleSwitch = 20;
+    private static final int rightSwitch = 12;
+    
     /* Motor Controllers */
     Victor rearLeftMotor = new Victor(MotorDriveRL);
     Victor midLeftMotor = new Victor(MotorDriveML);
@@ -66,6 +71,7 @@ public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
+    Joystick launchpad =  new Joystick(3);
     
     /* Pneumatics */ 
     Solenoid shifter = new Solenoid(SolenoidDriveShifter);
@@ -101,20 +107,22 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     @SuppressWarnings("unused")
+    /*
+     * Switches: Left Right Middle.  1 is up, 0 is down
+     * 1 2 3
+     * 
+     * 0 0 0 Joystick Slide Drive
+     * 0 0 1 Controller Slide Drive
+     * 1 0 0 Joystick Tank Drive
+     * 1 0 1 Controller Tank Drive
+     */
 	public void teleopPeriodic() {
     	
     	shifter.set(rightStick.getRawButton(shiftButton));
     	caster.set(leftStick.getRawButton(casterButton));
     	
-    	/*Drive Modes
-    	 * 0:Slide Drive
-    	 * 1:Tank Drive
-    	 * 2:Controller Slide Drive
-    	 * 3:Controller Tank Drive
-    	 */
-    	final int DriveMode = 3;
     	
-    	if (DriveMode == 0) {
+    	if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {
     		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
     		double right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
     		if (left > right) {
@@ -132,10 +140,7 @@ public class Robot extends IterativeRobot {
     		}
     		drive.tankDrive(left, right);
     		slideMotor.set(leftStick.getRawAxis(axisX));
-    		
-    	} else if (DriveMode == 1) {
-    		drive.tankDrive(leftStick, rightStick);
-    	} else if (DriveMode == 2) {
+    	} else if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {
     		shifter.set(operatorStick.getRawButton(6));
     		double left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
     		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
@@ -154,11 +159,14 @@ public class Robot extends IterativeRobot {
     		}
         	drive.tankDrive(left, right);
         	slideMotor.set(leftStick.getRawAxis(axisX));
-    	} else if (DriveMode == 3) {
+    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {
+    		drive.tankDrive(leftStick, rightStick);
+    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {
     		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
+    	} else {
+    		drive.tankDrive(leftStick, rightStick);
     	}
-    }
-    
+    } 
     /**
      * This function is called periodically during test mode
      */
