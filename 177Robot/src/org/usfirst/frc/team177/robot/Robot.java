@@ -35,6 +35,9 @@ public class Robot extends IterativeRobot {
     private static final int axisX = 0;
     private static final int axisY = 1;
     
+    /**Controller Constants**/
+    private static final int ControllerShiftButton = 6;
+    private static final int ControllerCasterButton = 5;
     /** Digital IO */
     private static final int DIOLeftEncoderA = 0;
     private static final int DIOLeftEncoderB = 1;
@@ -119,10 +122,9 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
     	
     	caster.set(leftStick.getRawButton(casterButton));
-    	
-    	
     	if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Slide Drive
-    		shifter.set(rightStick.getRawButton(shiftButton));
+    		caster.set(leftStick.getRawButton(casterButton));
+    		shifter.set(rightStick.getRawButton(shiftButton)); 
     		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
     		double right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
     		if (left > right) {
@@ -141,7 +143,8 @@ public class Robot extends IterativeRobot {
     		drive.tankDrive(left, right);
     		slideMotor.set(leftStick.getRawAxis(axisX));
     	} else if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Slide Drive
-    		shifter.set(operatorStick.getRawButton(6));
+    		caster.set(operatorStick.getRawButton(ControllerShiftButton));
+    		shifter.set(operatorStick.getRawButton(ControllerCasterButton));
     		double left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
     		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
     		if (left > right) {
@@ -160,13 +163,18 @@ public class Robot extends IterativeRobot {
         	drive.tankDrive(left, right);
         	slideMotor.set(leftStick.getRawAxis(axisX));
     	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Tank Drive
+    		caster.set(leftStick.getRawButton(casterButton));
     		shifter.set(rightStick.getRawButton(shiftButton));
     		drive.tankDrive(leftStick, rightStick);
     	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Tank Drive
-    		shifter.set(operatorStick.getRawButton(6));
+    		caster.set(operatorStick.getRawButton(ControllerShiftButton));
+    		shifter.set(operatorStick.getRawButton(ControllerCasterButton));
     		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
     	} else {
+    		caster.set(leftStick.getRawButton(casterButton));
+    		shifter.set(rightStick.getRawButton(shiftButton));
     		drive.tankDrive(leftStick, rightStick);
+    		
     	}
     } 
     /**
