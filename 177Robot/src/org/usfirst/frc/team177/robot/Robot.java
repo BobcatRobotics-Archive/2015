@@ -114,15 +114,25 @@ public class Robot extends IterativeRobot {
      * Switches: Left Right Middle.  1 is up, 0 is down
      * 1 2 3
      * 
-     * 0 0 0 Joystick Slide Drive
-     * 0 0 1 Controller Slide Drive
-     * 1 0 0 Joystick Tank Drive
-     * 1 0 1 Controller Tank Drive
+     * 0 0 0 Joystick Tank Drive
+     * 0 0 1 Controller Tank Drive
+     * 1 0 0 Joystick Slide Drive
+     * 1 0 1 Controller Slide Drive
      */
 	public void teleopPeriodic() {
     	
-    	caster.set(leftStick.getRawButton(casterButton));
-    	if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Slide Drive
+    	//caster.set(leftStick.getRawButton(casterButton));
+		//shifter.set(rightStick.getRawButton(shiftButton));
+		//drive.tankDrive(leftStick, rightStick);
+    	if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Tank Drive
+    		caster.set(leftStick.getRawButton(casterButton));
+    		shifter.set(rightStick.getRawButton(shiftButton));
+    		drive.tankDrive(leftStick, rightStick);
+    	} else if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Tank Drive
+    		caster.set(operatorStick.getRawButton(ControllerShiftButton));
+    		shifter.set(operatorStick.getRawButton(ControllerCasterButton));
+    		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
+    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Slide Drive
     		caster.set(leftStick.getRawButton(casterButton));
     		shifter.set(rightStick.getRawButton(shiftButton)); 
     		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
@@ -142,11 +152,12 @@ public class Robot extends IterativeRobot {
     		}
     		drive.tankDrive(left, right);
     		slideMotor.set(leftStick.getRawAxis(axisX));
-    	} else if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Slide Drive
+    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Slide Drive
     		caster.set(operatorStick.getRawButton(ControllerShiftButton));
     		shifter.set(operatorStick.getRawButton(ControllerCasterButton));
     		double left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
-    		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
+    		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2
+    				);
     		if (left > right) {
     			if (left > 1) {
     				double scale = 1 / left;
@@ -162,21 +173,12 @@ public class Robot extends IterativeRobot {
     		}
         	drive.tankDrive(left, right);
         	slideMotor.set(leftStick.getRawAxis(axisX));
-    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Tank Drive
-    		caster.set(leftStick.getRawButton(casterButton));
-    		shifter.set(rightStick.getRawButton(shiftButton));
-    		drive.tankDrive(leftStick, rightStick);
-    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Tank Drive
-    		caster.set(operatorStick.getRawButton(ControllerShiftButton));
-    		shifter.set(operatorStick.getRawButton(ControllerCasterButton));
-    		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
     	} else {
     		caster.set(leftStick.getRawButton(casterButton));
     		shifter.set(rightStick.getRawButton(shiftButton));
     		drive.tankDrive(leftStick, rightStick);
-    		
     	}
-    } 
+    }  
     /**
      * This function is called periodically during test mode
      */
