@@ -78,9 +78,9 @@ public class Robot extends IterativeRobot {
     Joystick launchpad =  new Joystick(3);
     
     /* Pneumatics */ 
-    Solenoid stacker0 = new Solenoid(ControllerStackButton0);
-    Solenoid stacker1 = new Solenoid(ControllerStackButton1);
-    Solenoid stacker2 = new Solenoid(ControllerStackButton2);
+    Solenoid stacker0 = new Solenoid(0);
+    Solenoid stacker1 = new Solenoid(1);
+    Solenoid stacker2 = new Solenoid(2);
     
     SendableChooser driveModeChooser;
     
@@ -158,9 +158,9 @@ public class Robot extends IterativeRobot {
      * 1 0 1 Controller Slide Drive
      */
 	public void teleopPeriodic() {
-    	stacker0.set(operatorStick.getRawButton(ControllerStackButton0));
-		stacker1.set(operatorStick.getRawButton(ControllerStackButton1));
-		stacker2.set(operatorStick.getRawButton(ControllerStackButton2));
+    	stacker0.set(operatorStick.getRawButton(1));
+		stacker1.set(operatorStick.getRawButton(1));
+		stacker2.set(operatorStick.getRawButton(2));
 		double left, right;
 		
 		stackMotor.set(operatorStick.getRawAxis(axisY));
