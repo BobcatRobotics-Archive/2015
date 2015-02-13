@@ -30,9 +30,8 @@ public class Robot extends IterativeRobot {
     private static final int MotorDriveRR = 2;
     private static final int MotorDriveFR = 4;
     
-    private static final int MotorSlide = 7;
-    
-    private static final int MotorStack = 6;
+    private static final int MotorSlide1 = 6;
+    private static final int MotorSlide2 = 7;
     
     /* Joystick Constants */ //Magic Numbers found in Joystick.class
     private static final int axisX = 0;
@@ -61,9 +60,9 @@ public class Robot extends IterativeRobot {
     Victor rearRightMotor = new Victor(MotorDriveRR);
     Victor frontRightMotor = new Victor(MotorDriveFR); 
     
-    Victor slideMotor = new Victor(MotorSlide);
+    Victor slideMotor1 = new Victor(MotorSlide1);
     
-    Talon stackMotor = new Talon(MotorStack);
+    Victor slideMotor2 = new Victor(MotorSlide2);
     
     RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
     
@@ -78,11 +77,15 @@ public class Robot extends IterativeRobot {
     Joystick launchpad =  new Joystick(3);
     
     /* Pneumatics */ 
-    Solenoid stacker0 = new Solenoid(0);
-    Solenoid stacker1 = new Solenoid(1);
-    Solenoid stacker2 = new Solenoid(2);
+    Solenoid lifter = new Solenoid(0);
+    Solenoid lowArmsPickup = new Solenoid(1);
+    Solenoid highBoxPickup = new Solenoid(2);
     
     SendableChooser driveModeChooser;
+    
+    boolean lowArmsPickupState;
+    boolean highBoxPickupState;
+    boolean lifterState;
     
     enum driveModeEnum {
 		TankJoyStickDrive,
@@ -147,29 +150,24 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during operator control
      */
-    @SuppressWarnings("unused")
-    /*
-     * Switches: Left Right Middle.  1 is up, 0 is down
-     * 1 2 3
-     * 
-     * 0 0 0 Joystick Tank Drive
-     * 0 0 1 Controller Tank Drive
-     * 1 0 0 Joystick Slide Drive
-     * 1 0 1 Controller Slide Drive
-     */
 	public void teleopPeriodic() {
-    	stacker0.set(operatorStick.getRawButton(1));
-		stacker1.set(operatorStick.getRawButton(1));
-		stacker2.set(operatorStick.getRawButton(2));
-		double left, right;
+		lowArmsPickupState = operatorStick.getRawButton(2);
+		highBoxPickupState = operatorStick.getRawButton(3);
+		lifterState = operatorStick.getRawButton(1);
+		lowArmsPickup.set(lowArmsPickupState);
 		
-		stackMotor.set(operatorStick.getRawAxis(axisY));
+		if(!lowArmsPickupState) {
+			highBoxPickup.set(highBoxPickupState);
+		} else {
+			highBoxPickup.set(lowArmsPickupState);
+			lowArmsPickup.set(lowArmsPickupState);
+		}
+		double left, right;
 		
 		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
 		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
 		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-
-		slideMotor.set(leftStick.getRawAxis(axisX) * -1);
+		
 		DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
@@ -178,7 +176,8 @@ public class Robot extends IterativeRobot {
 				drive.tankDrive(leftStick, rightStick);
 				break;
 			case SlideControllerDrive:
-				slideMotor.set(operatorStick.getRawAxis(0));
+				slideMotor1.set(operatorStick.getRawAxis(0));
+				slideMotor2.set(operatorStick.getRawAxis(0) * -1);
 				left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
 	    		right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
 	    		if (left > right) {
@@ -196,7 +195,9 @@ public class Robot extends IterativeRobot {
 	    		}
 	        	drive.tankDrive(left, right);
 				break;
-			case SlideJoyStickDrive:	
+			case SlideJoyStickDrive:
+				slideMotor1.set(leftStick.getRawAxis(axisX));
+				slideMotor2.set(leftStick.getRawAxis(axisX) * -1);
 				left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
 				right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
 				if (left > right) {
@@ -221,69 +222,6 @@ public class Robot extends IterativeRobot {
 			default:
 				break;
 		}
-		
-		/*
-		//caster.set(leftStick.getRawButton(casterButton));
-		//shifter.set(rightStick.getRawButton(shiftButton));
-		//drive.tankDrive(leftStick, rightStick);
-    	if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Tank Drive
-    		
-    		SmartDashboard.putString("Mode", "Tank Drive");
-    		stacker.set(leftStick.getRawButton(StackerButton));
-    		slider.set(rightStick.getRawButton(SliderButton));
-    		drive.tankDrive(leftStick, rightStick);
-    	
-    	} else if (launchpad.getRawButton(leftSwitch) == false && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Tank Drive
-    		slider.set(operatorStick.getRawButton(ControllerShiftButton));
-    		stacker.set(operatorStick.getRawButton(ControllerCasterButton));
-    		drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
-    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == false) {  //Joystick Slide Drive
-    		stacker.set(leftStick.getRawButton(StackerButton));
-    		slider.set(rightStick.getRawButton(SliderButton)); 
-    		double left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
-    		double right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
-    		if (left > right) {
-    			if (left > 1) {
-    				double scale = 1 / left;
-    				left = scale * left;
-    				right = scale * right;
-    			} 
-    		} else {
-    			if (right > 1) {
-    				double scale = 1 / right;
-    				left = scale * left;
-    				right = scale * right;
-    			}
-    		}
-    		drive.tankDrive(left, right);
-    		slideMotor.set(leftStick.getRawAxis(axisX));
-    	} else if (launchpad.getRawButton(leftSwitch) == true && launchpad.getRawButton(middleSwitch) == false && launchpad.getRawButton(rightSwitch) == true) {  //Controller Slide Drive
-    		slider.set(operatorStick.getRawButton(ControllerShiftButton));
-    		stacker.set(operatorStick.getRawButton(ControllerCasterButton));
-    		double left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
-    		double right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2
-    				);
-    		if (left > right) {
-    			if (left > 1) {
-    				double scale = 1 / left;
-    				left = scale * left;
-    				right = scale * right;
-    			} 
-    		} else {
-    			if (right > 1) {
-    				double scale = 1 / right;
-    				left = scale * left;
-    				right = scale * right;
-    			}
-    		}
-        	drive.tankDrive(left, right);
-        	slideMotor.set(leftStick.getRawAxis(axisX));
-    	} else {
-    		stacker.set(leftStick.getRawButton(StackerButton));
-    		slider.set(rightStick.getRawButton(SliderButton));
-    		drive.tankDrive(leftStick, rightStick);
-    	}
-    	*/
     }  
     /**
      * This function is called periodically during test mode
