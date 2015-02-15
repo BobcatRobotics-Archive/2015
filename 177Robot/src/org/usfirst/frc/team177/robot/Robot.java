@@ -1,13 +1,17 @@
 
 package org.usfirst.frc.team177.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Joystick.AxisType;
+import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +36,12 @@ public class Robot extends IterativeRobot {
     
     private static final int MotorSlide1 = 6;
     private static final int MotorSlide2 = 7;
+  
+    private static final int MotorPickup = 5;
+    
+    /* Relay Motors */
+    private static final int MotorWindow1 = 0;
+    private static final int MotorWindow2 = 1;
     
     /* Joystick Constants */ //Magic Numbers found in Joystick.class
     private static final int axisX = 0;
@@ -48,6 +58,9 @@ public class Robot extends IterativeRobot {
     private static final int DIORightEncoderA = 2;
     private static final int DIORightEncoderB = 3;
     
+    /** Analog IO**/
+    private static final int AIShoulderPot = 1;
+    
     /** Right Joystick Buttons **/
     
 
@@ -61,14 +74,21 @@ public class Robot extends IterativeRobot {
     Victor frontRightMotor = new Victor(MotorDriveFR); 
     
     Victor slideMotor1 = new Victor(MotorSlide1);
-    
     Victor slideMotor2 = new Victor(MotorSlide2);
+    
+    Talon pickupMotor = new Talon(MotorPickup);
+    
+    Relay window1 = new Relay(MotorWindow1);
+    Relay window2 = new Relay(MotorWindow2);
     
     RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
     
     /* Encoders */
     Encoder leftEncoder = new Encoder(DIOLeftEncoderA,DIOLeftEncoderB);
     Encoder rightEncoder = new Encoder(DIORightEncoderA,DIORightEncoderB);
+    
+    /** Analog Input **/
+    AnalogInput shoulderPosition = new AnalogInput(AIShoulderPot);
     
     /* Instantiate Joysticks */
     Joystick leftStick = new Joystick(0);
@@ -117,6 +137,8 @@ public class Robot extends IterativeRobot {
         drive.setInvertedMotor(RobotDrive6.MotorType.kMidLeft, true);
         drive.setInvertedMotor(RobotDrive6.MotorType.kRearLeft, true);
         */
+    	window1.setDirection(Relay.Direction.kBoth);
+    	window2.setDirection(Relay.Direction.kBoth);
     	leftEncoder.setDistancePerPulse(1);
     	rightEncoder.setDistancePerPulse(1);
     	driveModeChooser = new SendableChooser();
@@ -142,6 +164,7 @@ public class Robot extends IterativeRobot {
     }
     
     public void disabledPeriodic() {
+    	SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
     }
@@ -151,29 +174,43 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
 	public void teleopPeriodic() {
-		lowArmsPickupState = operatorStick.getRawButton(2);
-		highBoxPickupState = operatorStick.getRawButton(3);
-		lifterState = operatorStick.getRawButton(1);
+		if(operatorStick.getRawButton(5)) {
+			window1.set(Relay.Value.kForward);
+			window2.set(Relay.Value.kForward);
+		} else if(operatorStick.getRawButton(7)) {
+			window1.set(Relay.Value.kReverse);
+			window2.set(Relay.Value.kReverse);
+		} else {
+			window1.set(Relay.Value.kOff);
+			window2.set(Relay.Value.kOff);
+		}
+		lowArmsPickupState = operatorStick.getRawButton(1);
+		highBoxPickupState = operatorStick.getRawButton(2);
+		lifterState = operatorStick.getRawButton(6);
+		lifter.set(lifterState);
 		lowArmsPickup.set(lowArmsPickupState);
 		
 		if(!lowArmsPickupState) {
-			highBoxPickup.set(highBoxPickupState);
-		} else {
-			highBoxPickup.set(lowArmsPickupState);
-			lowArmsPickup.set(lowArmsPickupState);
+		 	highBoxPickup.set(highBoxPickupState);
 		}
 		double left, right;
+		pickupMotor.set(operatorStick.getRawAxis(3));
 		
+		/** Smart Dashboard **/
+		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
 		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
 		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
 		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
 		
+		/** Drive Mode **/
 		DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		switch (ActiveDriveMode.getMode()) {
 			case TankJoyStickDrive:
 				drive.tankDrive(leftStick, rightStick);
+				slideMotor1.set(leftStick.getRawAxis(axisX));
+				slideMotor2.set(leftStick.getRawAxis(axisX) * -1);
 				break;
 			case SlideControllerDrive:
 				slideMotor1.set(operatorStick.getRawAxis(0));
