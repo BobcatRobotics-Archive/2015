@@ -47,11 +47,6 @@ public class Robot extends IterativeRobot {
     private static final int axisX = 0;
     private static final int axisY = 1;
     
-    /**Controller Constants**/
-    private static final int ControllerStackButton0 = 1;
-    private static final int ControllerStackButton1 = 2;
-    private static final int ControllerStackButton2 = 3;
-    
     /** Digital IO */
     private static final int DIOLeftEncoderA = 0;
     private static final int DIOLeftEncoderB = 1;
@@ -194,7 +189,7 @@ public class Robot extends IterativeRobot {
 		 	highBoxPickup.set(highBoxPickupState);
 		}
 		double left, right;
-		pickupMotor.set(operatorStick.getRawAxis(3));
+		pickupMotor.set(operatorStick.getRawAxis(3));  //TODO make this use the left analog stick
 		
 		/** Smart Dashboard **/
 		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
