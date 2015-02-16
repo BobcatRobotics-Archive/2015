@@ -39,6 +39,7 @@ public class Robot extends IterativeRobot {
   
     private static final int MotorPickup = 5;
     
+    private static final int MotorShoulderTilt = 8;
     /** Relay Motors **/
     private static final int MotorWindow1 = 0;
     private static final int MotorWindow2 = 1;
@@ -68,6 +69,8 @@ public class Robot extends IterativeRobot {
     
     Talon pickupMotor = new Talon(MotorPickup);
     
+    Victor shoulderTiltMotor = new Victor(MotorShoulderTilt);
+    
     Relay window1 = new Relay(MotorWindow1);
     Relay window2 = new Relay(MotorWindow2);
     
@@ -90,6 +93,7 @@ public class Robot extends IterativeRobot {
     Solenoid lifter = new Solenoid(0);
     Solenoid lowArmsPickup = new Solenoid(1);
     Solenoid highBoxPickup = new Solenoid(2);
+    Solenoid shoulderTiltPneumatic = new Solenoid(3);
     
     SendableChooser driveModeChooser;
     
@@ -170,12 +174,15 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
 	public void teleopPeriodic() {
+		/** Shoulder Tilt **/
+		shoulderTiltMotor.set(operatorStick.getRawAxis(3));   //Untested might not work
+		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
 		
 		/**Window Motor Control **/
-		if(operatorStick.getRawButton(5)) {
+		if(operatorStick.getRawButton(6)) {
 			window1.set(Relay.Value.kForward);
 			window2.set(Relay.Value.kForward);
-		} else if(operatorStick.getRawButton(7)) {
+		} else if(operatorStick.getRawButton(8)) {
 			window1.set(Relay.Value.kReverse);
 			window2.set(Relay.Value.kReverse);
 		} else {
@@ -184,10 +191,14 @@ public class Robot extends IterativeRobot {
 		}
 		
 		/** Stacking Controller bindings **/
-		pickupMotor.set(operatorStick.getRawAxis(1));  
-		lifterState = operatorStick.getRawButton(6);
-		lowArmsPickupState = operatorStick.getRawButton(1);
-		highBoxPickupState = operatorStick.getRawButton(2);
+		pickupMotor.set(operatorStick.getRawAxis(1));
+		if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
+			lowArmsPickupState = true;
+		}
+		lifterState = operatorStick.getRawButton(5);
+		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
+			highBoxPickupState = true;
+		}
 		
 		/** Stacker Anti-Failure Logic **/
 		lifter.set(lifterState);
