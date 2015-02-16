@@ -170,6 +170,38 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
 	public void teleopPeriodic() {
+		
+		/**Window Motor Control **/
+		if(operatorStick.getRawButton(5)) {
+			window1.set(Relay.Value.kForward);
+			window2.set(Relay.Value.kForward);
+		} else if(operatorStick.getRawButton(7)) {
+			window1.set(Relay.Value.kReverse);
+			window2.set(Relay.Value.kReverse);
+		} else {
+			window1.set(Relay.Value.kOff);
+			window2.set(Relay.Value.kOff);
+		}
+		
+		/** Stacking Controller bindings **/
+		pickupMotor.set(operatorStick.getRawAxis(1));  
+		lifterState = operatorStick.getRawButton(6);
+		lowArmsPickupState = operatorStick.getRawButton(1);
+		highBoxPickupState = operatorStick.getRawButton(2);
+		
+		/** Stacker Anti-Failure Logic **/
+		lifter.set(lifterState);
+		lowArmsPickup.set(lowArmsPickupState);
+		if(!lowArmsPickupState) {
+		 	highBoxPickup.set(highBoxPickupState);
+		}
+		
+		/** Smart Dashboard **/
+		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
+		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
+		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+		
 		/** Drive Mode **/
 		double left , right;
 		
@@ -179,8 +211,7 @@ public class Robot extends IterativeRobot {
 		switch (ActiveDriveMode.getMode()) {
 			case TankJoyStickDrive:
 				drive.tankDrive(leftStick, rightStick);
-				slideMotor1.set(leftStick.getRawAxis(axisX));
-				slideMotor2.set(leftStick.getRawAxis(axisX) * -1);
+				
 				break;
 			case SlideControllerDrive:
 				slideMotor1.set(operatorStick.getRawAxis(0));
@@ -225,42 +256,12 @@ public class Robot extends IterativeRobot {
 				break;
 			case TankControllerDrive:
 				drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
+				slideMotor1.set(operatorStick.getRawAxis(0));
+				slideMotor2.set(leftStick.getRawAxis(0) * -1);
 				break;
 			default:
 				break;
 		}
-		
-		
-		/**Window Motor Control **/
-		if(operatorStick.getRawButton(5)) {
-			window1.set(Relay.Value.kForward);
-			window2.set(Relay.Value.kForward);
-		} else if(operatorStick.getRawButton(7)) {
-			window1.set(Relay.Value.kReverse);
-			window2.set(Relay.Value.kReverse);
-		} else {
-			window1.set(Relay.Value.kOff);
-			window2.set(Relay.Value.kOff);
-		}
-		
-		/** Stacking Controller bindings **/
-		pickupMotor.set(operatorStick.getRawAxis(3));  //TODO make this use the left analog stick
-		lifterState = operatorStick.getRawButton(6);
-		lowArmsPickupState = operatorStick.getRawButton(1);
-		highBoxPickupState = operatorStick.getRawButton(2);
-		
-		/** Stacker Anti-Failure Logic **/
-		lifter.set(lifterState);
-		lowArmsPickup.set(lowArmsPickupState);
-		if(!lowArmsPickupState) {
-		 	highBoxPickup.set(highBoxPickupState);
-		}
-		
-		/** Smart Dashboard **/
-		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
-		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
-		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
     }  
     /**
      * This function is called periodically during test mode
