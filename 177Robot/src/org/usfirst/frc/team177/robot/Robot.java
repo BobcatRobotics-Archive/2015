@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.Encoder;
 public class Robot extends IterativeRobot {
 	
 	/** IO Definitions **/
-    /* Motors */
+    /** Motors **/
     private static final int MotorDriveRL = 1;
     private static final int MotorDriveFL = 3;
     
@@ -39,11 +39,11 @@ public class Robot extends IterativeRobot {
   
     private static final int MotorPickup = 5;
     
-    /* Relay Motors */
+    /** Relay Motors **/
     private static final int MotorWindow1 = 0;
     private static final int MotorWindow2 = 1;
     
-    /* Joystick Constants */ //Magic Numbers found in Joystick.class
+    /** Joystick Constants **/ //Magic Numbers found in Joystick.class
     private static final int axisX = 0;
     private static final int axisY = 1;
     
@@ -56,12 +56,7 @@ public class Robot extends IterativeRobot {
     /** Analog IO**/
     private static final int AIShoulderPot = 1;
     
-    /** Right Joystick Buttons **/
-    
-
-    /** Left Joystick Buttons **/
-    
-    /* Motor Controllers */
+    /** Motor Controllers **/
     Victor rearLeftMotor = new Victor(MotorDriveRL);
     Victor frontLeftMotor = new Victor(MotorDriveFL);
     
@@ -78,20 +73,20 @@ public class Robot extends IterativeRobot {
     
     RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
     
-    /* Encoders */
+    /** Encoders **/
     Encoder leftEncoder = new Encoder(DIOLeftEncoderA,DIOLeftEncoderB);
     Encoder rightEncoder = new Encoder(DIORightEncoderA,DIORightEncoderB);
     
     /** Analog Input **/
     AnalogInput shoulderPosition = new AnalogInput(AIShoulderPot);
     
-    /* Instantiate Joysticks */
+    /** Instantiate Joysticks **/
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
     Joystick launchpad =  new Joystick(3);
     
-    /* Pneumatics */ 
+    /** Pneumatics **/ 
     Solenoid lifter = new Solenoid(0);
     Solenoid lowArmsPickup = new Solenoid(1);
     Solenoid highBoxPickup = new Solenoid(2);
@@ -132,10 +127,16 @@ public class Robot extends IterativeRobot {
         drive.setInvertedMotor(RobotDrive6.MotorType.kMidLeft, true);
         drive.setInvertedMotor(RobotDrive6.MotorType.kRearLeft, true);
         */
+    	
+    	/** Window Motor Setup **/
     	window1.setDirection(Relay.Direction.kBoth);
     	window2.setDirection(Relay.Direction.kBoth);
+    	
+    	/**Encoder Setup **/
     	leftEncoder.setDistancePerPulse(1);
     	rightEncoder.setDistancePerPulse(1);
+    	
+    	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
     	for( driveModeEnum dm : driveModeEnum.values()) {
     		driveModeChooser.addObject(dm.toString(), new DriveMode(dm));
@@ -144,7 +145,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putData("DriveMode", driveModeChooser);
     	
     	
-    	/*Setup LiveWindow */        
+    	/** Setup LiveWindow **/        
         LiveWindow.addActuator("Drive", "Left Front", frontLeftMotor);
         LiveWindow.addActuator("Drive", "Left Rear", rearLeftMotor);
         LiveWindow.addActuator("Drive", "Right Front", frontRightMotor);
@@ -169,35 +170,9 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
 	public void teleopPeriodic() {
-		if(operatorStick.getRawButton(5)) {
-			window1.set(Relay.Value.kForward);
-			window2.set(Relay.Value.kForward);
-		} else if(operatorStick.getRawButton(7)) {
-			window1.set(Relay.Value.kReverse);
-			window2.set(Relay.Value.kReverse);
-		} else {
-			window1.set(Relay.Value.kOff);
-			window2.set(Relay.Value.kOff);
-		}
-		lowArmsPickupState = operatorStick.getRawButton(1);
-		highBoxPickupState = operatorStick.getRawButton(2);
-		lifterState = operatorStick.getRawButton(6);
-		lifter.set(lifterState);
-		lowArmsPickup.set(lowArmsPickupState);
-		
-		if(!lowArmsPickupState) {
-		 	highBoxPickup.set(highBoxPickupState);
-		}
-		double left, right;
-		pickupMotor.set(operatorStick.getRawAxis(3));  //TODO make this use the left analog stick
-		
-		/** Smart Dashboard **/
-		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
-		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
-		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
-		
 		/** Drive Mode **/
+		double left , right;
+		
 		DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
@@ -254,6 +229,38 @@ public class Robot extends IterativeRobot {
 			default:
 				break;
 		}
+		
+		
+		/**Window Motor Control **/
+		if(operatorStick.getRawButton(5)) {
+			window1.set(Relay.Value.kForward);
+			window2.set(Relay.Value.kForward);
+		} else if(operatorStick.getRawButton(7)) {
+			window1.set(Relay.Value.kReverse);
+			window2.set(Relay.Value.kReverse);
+		} else {
+			window1.set(Relay.Value.kOff);
+			window2.set(Relay.Value.kOff);
+		}
+		
+		/** Stacking Controller bindings **/
+		pickupMotor.set(operatorStick.getRawAxis(3));  //TODO make this use the left analog stick
+		lifterState = operatorStick.getRawButton(6);
+		lowArmsPickupState = operatorStick.getRawButton(1);
+		highBoxPickupState = operatorStick.getRawButton(2);
+		
+		/** Stacker Anti-Failure Logic **/
+		lifter.set(lifterState);
+		lowArmsPickup.set(lowArmsPickupState);
+		if(!lowArmsPickupState) {
+		 	highBoxPickup.set(highBoxPickupState);
+		}
+		
+		/** Smart Dashboard **/
+		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
+		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
+		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
+		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
     }  
     /**
      * This function is called periodically during test mode
