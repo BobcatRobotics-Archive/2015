@@ -1,21 +1,25 @@
 
 package org.usfirst.frc.team177.robot;
 
+import org.usfirst.frc.team177.auto.AutoMode;
+import org.usfirst.frc.team177.auto.AutoModeDriveTest;
+import org.usfirst.frc.team177.auto.AutoModeDriveToTest;
+import org.usfirst.frc.team177.auto.AutoModePickupCan;
+import org.usfirst.frc.team177.lib.HTTPServer;
+import org.usfirst.frc.team177.lib.Locator;
+import org.usfirst.frc.team177.lib.Logger;
+
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.Joystick.AxisType;
-import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Encoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -47,13 +51,7 @@ public class Robot extends IterativeRobot {
     /** Joystick Constants **/ //Magic Numbers found in Joystick.class
     private static final int axisX = 0;
     private static final int axisY = 1;
-    
-    /** Digital IO */
-    private static final int DIOLeftEncoderA = 0;
-    private static final int DIOLeftEncoderB = 1;
-    private static final int DIORightEncoderA = 2;
-    private static final int DIORightEncoderB = 3;
-    
+       
     /** Analog IO**/
     private static final int AIShoulderPot = 1;
     
@@ -68,18 +66,14 @@ public class Robot extends IterativeRobot {
     Victor slideMotor2 = new Victor(MotorSlide2);
     
     Talon pickupMotor = new Talon(MotorPickup);
-    
-    Victor shoulderTiltMotor = new Victor(MotorShoulderTilt);
+        
+    public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
     
     Relay window1 = new Relay(MotorWindow1);
     Relay window2 = new Relay(MotorWindow2);
     
-    RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
-    
-    /** Encoders **/
-    Encoder leftEncoder = new Encoder(DIOLeftEncoderA,DIOLeftEncoderB);
-    Encoder rightEncoder = new Encoder(DIORightEncoderA,DIORightEncoderB);
-    
+    public RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
+       
     /** Analog Input **/
     AnalogInput shoulderPosition = new AnalogInput(AIShoulderPot);
     
@@ -95,6 +89,21 @@ public class Robot extends IterativeRobot {
     Solenoid highBoxPickup = new Solenoid(2);
     Solenoid shoulderTiltPneumatic = new Solenoid(3);
     
+    /* Automode Variables */
+    int autoMode = 0;
+    double autoDelay = 0;    
+    AutoMode auto;
+    
+    /* Navigation functions */
+    public Locator locator = new Locator();
+    
+    //Web server
+    private Thread tHTTP;
+    
+    //Logger
+    private Logger logger = new Logger();
+    
+       
     SendableChooser driveModeChooser;
     
     boolean lowArmsPickupState;
@@ -132,13 +141,18 @@ public class Robot extends IterativeRobot {
         drive.setInvertedMotor(RobotDrive6.MotorType.kRearLeft, true);
         */
     	
+    	locator.start();
+    	
+    	//HTTP Server
+    	tHTTP = new Thread(new HTTPServer());
+    	tHTTP.start();
+    	
+    	//Setup Logger
+    	logger.add(locator);
+    	
     	/** Window Motor Setup **/
     	window1.setDirection(Relay.Direction.kBoth);
     	window2.setDirection(Relay.Direction.kBoth);
-    	
-    	/**Encoder Setup **/
-    	leftEncoder.setDistancePerPulse(1);
-    	rightEncoder.setDistancePerPulse(1);
     	
     	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
@@ -156,26 +170,79 @@ public class Robot extends IterativeRobot {
         LiveWindow.addActuator("Drive", "Right Rear", rearRightMotor);
     }
 
+    
+    public void autonomousInit()
+    {
+    	if(auto != null) {
+            auto.autoInit();
+        }
+    	if(logger != null) {
+    		logger.start();
+    	}
+    }
+    
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
- 
+        if(auto != null /*&& m_ds.getMatchTime() > autoDelay*/) {
+            auto.autoPeriodic();        
+        } else {
+            drive.tankDrive(0, 0);
+        }
     }
     
     public void disabledPeriodic() {
-    	SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
+    	SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+    	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
-    }
-    
+		
+		try {
+    		int new_automode = (launchpad.getRawButton(1) ? 0 : 4) + (launchpad.getRawButton(2) ? 0 : 2) + (launchpad.getRawButton(3) ? 0 : 1);
+    		if (new_automode != autoMode)
+    		{
+    			autoMode = new_automode;
+    			/* Add automodes here:
+    			 * 0 = Do Nothing
+    			 * 1 = Drive Test
+    			 */
+				switch (autoMode)
+				{
+				    case 1:
+				    	auto = new AutoModeDriveTest(this);
+				    	break;
+				    case 2:
+				    	auto = new AutoModeDriveToTest(this);
+				    	break;
+				    case 3:
+				    	auto = new AutoModePickupCan(this);
+				    	break;
+				    default:
+				    	auto = null;
+				    	break;
+			    }
+    		}
+            autoDelay = 0; //(inputs.getX() + 1.0f)*10.0f;  //-1 to 1 gives you a range 0 - 20
+        } catch (Exception e) {
+            System.out.println("Error in disabledPeriodic: " + e);
+        }
+
+        //Send the selected mode to the driver station
+        if(auto == null) {
+            SmartDashboard.putString("Auto Mode", "Do Nothing"); 
+        } else {
+            SmartDashboard.putString("Auto Mode", auto.getName()); 
+        }
+        SmartDashboard.putNumber("Auto Delay", autoDelay);
+   	}		
 
     /**
      * This function is called periodically during operator control
      */
 	public void teleopPeriodic() {
 		/** Shoulder Tilt **/
-		shoulderTiltMotor.set(operatorStick.getRawAxis(3));   //Untested might not work
+		shoulder.set(operatorStick.getRawAxis(3)); 
 		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
 		
 		/**Window Motor Control **/
@@ -210,23 +277,27 @@ public class Robot extends IterativeRobot {
 		/** Smart Dashboard **/
 		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
 		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
-		SmartDashboard.putNumber("leftEncoder", leftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Encoder", rightEncoder.getDistance());
+		
+		//Encoders maybe redundant here?
+		SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
+		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
+		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
+		SmartDashboard.putNumber("Slide2 Encoder", locator.getSlide2EncoderDistance());
 		
 		/** Drive Mode **/
-		double left , right;
+		double left = 0, right = 0, slide = 0;
 		
 		DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		switch (ActiveDriveMode.getMode()) {
 			case TankJoyStickDrive:
-				drive.tankDrive(leftStick, rightStick);
-				
+				left = leftStick.getRawAxis(axisY);
+				right = rightStick.getRawAxis(axisY);
+				slide = rightStick.getRawAxis(axisX); 								
 				break;
 			case SlideControllerDrive:
-				slideMotor1.set(operatorStick.getRawAxis(0));
-				slideMotor2.set(operatorStick.getRawAxis(0) * -1);
+				slide = operatorStick.getRawAxis(0);
 				left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
 	    		right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
 	    		if (left > right) {
@@ -242,11 +313,9 @@ public class Robot extends IterativeRobot {
 	    				right = scale * right;
 	    			}
 	    		}
-	        	drive.tankDrive(left, right);
 				break;
 			case SlideJoyStickDrive:
-				slideMotor1.set(leftStick.getRawAxis(axisX));
-				slideMotor2.set(leftStick.getRawAxis(axisX) * -1);
+				slide = leftStick.getRawAxis(axisX);				
 				left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
 				right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
 				if (left > right) {
@@ -262,17 +331,30 @@ public class Robot extends IterativeRobot {
 						right = scale * right;
 					}
 				}
-
-				drive.tankDrive(left, right);
+				
 				break;
 			case TankControllerDrive:
-				drive.tankDrive(operatorStick.getRawAxis(1), operatorStick.getRawAxis(3));
-				slideMotor1.set(operatorStick.getRawAxis(0));
-				slideMotor2.set(leftStick.getRawAxis(0) * -1);
+				left = operatorStick.getRawAxis(1);
+				right = operatorStick.getRawAxis(3);
+				slide = operatorStick.getRawAxis(0);				
 				break;
 			default:
 				break;
 		}
+		
+		//If the shift switch is set reverse the orientation of the robot
+		if(leftStick.getRawButton(3))
+		{
+			double temp = left;
+			left = -1.0 * right;
+			right = -1.0 * temp;
+			slide = -1.0 * slide;
+		}
+		
+		/* Set motor outputs in one place */		
+		drive.tankDrive(left, right);
+		slideMotor1.set(slide);
+		slideMotor2.set(-1.0*slide);
     }  
     /**
      * This function is called periodically during test mode
