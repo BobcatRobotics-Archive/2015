@@ -26,16 +26,12 @@ public class Constants extends ConstantsBase {
 	public static final Constant DIOSlide2EncoderA = new Constant("DIOSlide2EncoderA", 6);
 	public static final Constant DIOSlide2EncoderB = new Constant("DIOSlide2EncoderB", 7);
 	
-	/** Encoder Calibration */
-	public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 12.57/128);
-	public static final Constant RightEncoderDPP = new Constant("RightEncoderDPP", 12.57/128);
-	public static final Constant SlideEncoderDPP = new Constant("SlideEncoderDPP", 12.57/128);
-	
-	/** Digital Inputs **/
-	public static final Constant DIOToteSensor = new Constant("DIOToteSensor", 8);
-	
 	/** Analog inputs **/
-	public static final Constant AIOGyro = new Constant("AIOGyro", 0);	
+	public static final Constant AIOGyro = new Constant("AIOGyro", 0);
+
+	public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 1);
+	public static final Constant RightEncoderDPP = new Constant("RightEncoderDPP", 1);
+	public static final Constant SlideEncoderDPP = new Constant("SlideEncoderDPP", 1);	
 	
     /** Trajectory config **/
     public static final Constant maxVel = new Constant("maxVel", 15.0);
@@ -50,8 +46,7 @@ public class Constants extends ConstantsBase {
     public static final Constant trajKa = new Constant("trajKa", 1.0/34.0);
     public static final Constant kTurn = new Constant("kTurn", -3.0/80.0);
     
-    public static final Constant robotWidth = new Constant("RobotWidth", 41.5);
-    public static final Constant robotLength = new Constant("RobotLength", 27.5);
+    public static final Constant robotWidth = new Constant("RobotWidth", 28);
     
     /** Logging **/
     public static final Constant loggingDt = new Constant("LoggingDt", 100);

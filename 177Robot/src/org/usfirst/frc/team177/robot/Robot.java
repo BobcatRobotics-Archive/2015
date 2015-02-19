@@ -2,6 +2,7 @@
 package org.usfirst.frc.team177.robot;
 
 import org.usfirst.frc.team177.auto.AutoMode;
+import org.usfirst.frc.team177.auto.AutoMode3Totes;
 import org.usfirst.frc.team177.auto.AutoModeDriveTest;
 import org.usfirst.frc.team177.auto.AutoModeDriveToTest;
 import org.usfirst.frc.team177.auto.AutoModePickupCan;
@@ -10,6 +11,7 @@ import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Relay;
@@ -41,12 +43,14 @@ public class Robot extends IterativeRobot {
     private static final int MotorSlide1 = 6;
     private static final int MotorSlide2 = 7;
   
-    private static final int MotorPickup = 5;
+    private static final int MotorPickup1 = 5;
+    private static final int MotorPickup2 = 9;
     
     private static final int MotorShoulderTilt = 8;
+    
     /** Relay Motors **/
-    private static final int MotorWindow1 = 0;
-    private static final int MotorWindow2 = 1;
+    private static final int ClawMotor1 = 0;
+    private static final int ClawMotor2 = 1;
     
     /** Joystick Constants **/ //Magic Numbers found in Joystick.class
     private static final int axisX = 0;
@@ -65,13 +69,19 @@ public class Robot extends IterativeRobot {
     Victor slideMotor1 = new Victor(MotorSlide1);
     Victor slideMotor2 = new Victor(MotorSlide2);
     
-    Talon pickupMotor = new Talon(MotorPickup);
+    public Victor pickupMotor1 = new Victor(MotorPickup1);
+    public Victor pickupMotor2 = new Victor(MotorPickup2);
         
+    /** Shoulder **/
     public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
     
-    Relay window1 = new Relay(MotorWindow1);
-    Relay window2 = new Relay(MotorWindow2);
+    /** Relays **/
+    Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
+    Relay clawMotor2 = new Relay(ClawMotor2, Relay.Direction.kBoth);    
     
+    /** Digital Inputs **/
+    public DigitalInput toteSensor = new DigitalInput(Constants.DIOToteSensor.getInt());
+            
     public RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
        
     /** Analog Input **/
@@ -84,10 +94,10 @@ public class Robot extends IterativeRobot {
     Joystick launchpad =  new Joystick(3);
     
     /** Pneumatics **/ 
-    Solenoid lifter = new Solenoid(0);
-    Solenoid lowArmsPickup = new Solenoid(1);
-    Solenoid highBoxPickup = new Solenoid(2);
-    Solenoid shoulderTiltPneumatic = new Solenoid(3);
+    public Solenoid lifter = new Solenoid(0);
+    public Solenoid lowArmsPickup = new Solenoid(1);
+    public Solenoid highBoxPickup = new Solenoid(2);
+    public Solenoid shoulderTiltPneumatic = new Solenoid(3);
     
     /* Automode Variables */
     int autoMode = 0;
@@ -149,11 +159,7 @@ public class Robot extends IterativeRobot {
     	
     	//Setup Logger
     	logger.add(locator);
-    	
-    	/** Window Motor Setup **/
-    	window1.setDirection(Relay.Direction.kBoth);
-    	window2.setDirection(Relay.Direction.kBoth);
-    	
+
     	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
     	for( driveModeEnum dm : driveModeEnum.values()) {
@@ -197,6 +203,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
+		SmartDashboard.putBoolean("Tote Sensor", toteSensor.get());
 		
 		try {
     		int new_automode = (launchpad.getRawButton(1) ? 0 : 4) + (launchpad.getRawButton(2) ? 0 : 2) + (launchpad.getRawButton(3) ? 0 : 1);
@@ -204,8 +211,6 @@ public class Robot extends IterativeRobot {
     		{
     			autoMode = new_automode;
     			/* Add automodes here:
-    			 * 0 = Do Nothing
-    			 * 1 = Drive Test
     			 */
 				switch (autoMode)
 				{
@@ -217,6 +222,9 @@ public class Robot extends IterativeRobot {
 				    	break;
 				    case 3:
 				    	auto = new AutoModePickupCan(this);
+				    	break;
+				    case 4:
+				    	auto = new AutoMode3Totes(this);
 				    	break;
 				    default:
 				    	auto = null;
@@ -247,18 +255,19 @@ public class Robot extends IterativeRobot {
 		
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
-			window1.set(Relay.Value.kForward);
-			window2.set(Relay.Value.kForward);
+			clawMotor1.set(Relay.Value.kForward);
+			clawMotor2.set(Relay.Value.kForward);
 		} else if(operatorStick.getRawButton(8)) {
-			window1.set(Relay.Value.kReverse);
-			window2.set(Relay.Value.kReverse);
+			clawMotor1.set(Relay.Value.kReverse);
+			clawMotor2.set(Relay.Value.kReverse);
 		} else {
-			window1.set(Relay.Value.kOff);
-			window2.set(Relay.Value.kOff);
+			clawMotor1.set(Relay.Value.kOff);
+			clawMotor2.set(Relay.Value.kOff);
 		}
 		
 		/** Stacking Controller bindings **/
-		pickupMotor.set(operatorStick.getRawAxis(1));
+		pickupMotor1.set(operatorStick.getRawAxis(1));
+		pickupMotor2.set(operatorStick.getRawAxis(1));
 		if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
 		}
