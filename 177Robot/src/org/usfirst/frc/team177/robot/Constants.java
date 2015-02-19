@@ -43,7 +43,7 @@ public class Constants extends ConstantsBase {
     public static final Constant maxJerk = new Constant("maxJerk", 15.0 * 5);
     public static final Constant updateDt = new Constant("updateDT", 10);
     
-    public static final Constant trajKp = new Constant("trajKp", 1.5);
+    public static final Constant trajKp = new Constant("trajKp", 0.1);
     public static final Constant trajKi = new Constant("trajKi", 0.0);
     public static final Constant trajKd = new Constant("trajKd", 0.0);
     public static final Constant trajKv = new Constant("trajKv", 1.0/15.0);

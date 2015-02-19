@@ -140,4 +140,15 @@ public class AutoMode3Totes extends AutoMode {
     public String getName() {
         return "3 Totes";
     }
+    
+	@Override
+	public String GetColumNames() {
+		return "StepCount, ToteCount";
+	}
+
+
+	@Override
+	public String log() {
+		return String.format("%d,%d", StepCount, ToteCount);
+	}
 }

@@ -22,6 +22,12 @@ public class Logger {
 	
 	}
 	
+	//Remove all registered loggers
+	public void clear() {
+		stop();
+		logList.clear();
+	}
+	
 	//Add a new class to the list of classes to log
 	//This probably shouldn't be called while logging is in processes 
 	public void add(Logable l) {

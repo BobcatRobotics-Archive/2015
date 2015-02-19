@@ -1,5 +1,7 @@
 package org.usfirst.frc.team177.trajectory;
 
+import org.usfirst.frc.team177.lib.Logable;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //Blatantly stolen for ChezzyPoofs 2014 code
@@ -9,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * @author Jared341
  */
-public class TrajectoryFollower {
+public class TrajectoryFollower implements Logable {
 
   private double kp_;
   private double ki_;  // Not currently used, but might be in the future.
@@ -17,6 +19,7 @@ public class TrajectoryFollower {
   private double kv_;
   private double ka_;
   private double last_error_;
+  private double last_distance_so_far_;
   private double current_heading = 0;
   private int current_segment;
   private Trajectory profile_;
@@ -44,7 +47,7 @@ public class TrajectoryFollower {
   }
 
   public double calculate(double distance_so_far) {
-   
+	last_distance_so_far_ = distance_so_far;
     if (current_segment < profile_.getNumSegments()) {
       Trajectory.Segment segment = profile_.getSegment(current_segment);
       double error = segment.pos - distance_so_far;
@@ -64,6 +67,11 @@ public class TrajectoryFollower {
     }
   }
 
+  //Used for simulating and logging
+  public double getExpectedDistance() {
+	  return profile_.getSegment(current_segment).pos;
+  }
+  
   public double getHeading() {
     return current_heading;
   }
@@ -79,4 +87,18 @@ public class TrajectoryFollower {
   public int getNumSegments() {
     return profile_.getNumSegments();
   }
+
+	@Override
+	public String GetColumNames() {
+		return "last_error, current_segment, expected_distance, last_distance";
+	}
+	
+	@Override
+	public String log() {
+		double eDist = 0;
+		//if (current_segment < profile_.getNumSegments()) {
+			eDist = getExpectedDistance();
+		//}
+		return String.format("%.2f,%d,%.2f,%.2f", last_error_, current_segment, eDist, last_distance_so_far_);
+	}
 }

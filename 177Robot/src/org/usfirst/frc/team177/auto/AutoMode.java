@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 
  */
 
-public abstract class AutoMode {
+public abstract class AutoMode implements Logable {
 
 	Robot robot; //reference to main implementation
 	
@@ -281,8 +281,17 @@ public abstract class AutoMode {
     	}
     }
     
+    /*Made protected so that they can be logged in the specific automode */
+    protected double distanceL;
+    protected double distanceR;
+    protected double speedLeft;
+    protected double speedRight;
+    protected double goalHeading;
+    protected double observedHeading;
+    protected double angleDiff;
+    protected double turn;
     
-    //Update ongoaing 
+    //Update ongoing 
     public void Update() {
     	double direction = -1; //set to -1 to go backwards?
     	
@@ -290,20 +299,32 @@ public abstract class AutoMode {
     		robot.drive.tankDrive(0.0, 0.0);
     		stopDriveTimer();
    	    } else  {
-   	    	double distanceL = direction * robot.locator.getLeftEncoderDistance();
-    	    double distanceR = direction * robot.locator.getRightEncoderDistance();
+   	    	distanceL = direction * robot.locator.getLeftEncoderDistance();
+    	    distanceR = direction * robot.locator.getRightEncoderDistance();
 
-    	    double speedLeft = direction * followerLeft.calculate(distanceL);
-    	    double speedRight = direction * followerRight.calculate(distanceR);
+    	    speedLeft = direction * followerLeft.calculate(distanceL);
+    	    speedRight = direction * followerRight.calculate(distanceR);
     	      
-    	    double goalHeading = followerLeft.getHeading();
-    	    double observedHeading = robot.locator.getGyroAngleInRadians();
+    	    goalHeading = followerLeft.getHeading();
+    	    observedHeading = robot.locator.getGyroAngleInRadians();
 
     	    double angleDiffRads = BobcatUtils.getDifferenceInAngleRadians(observedHeading, goalHeading);
-    	    double angleDiff = Math.toDegrees(angleDiffRads);
+    	    angleDiff = Math.toDegrees(angleDiffRads);
 
-    	    double turn = Constants.kTurn.getDouble() * angleDiff;
+    	    turn = Constants.kTurn.getDouble() * angleDiff;
     	    robot.drive.tankDrive(speedLeft + turn, speedRight - turn);
    	    }
     }
+    
+    //Default logging behavior is to log nothing
+	@Override
+	public String GetColumNames() {
+		return null;
+	}
+
+
+	@Override
+	public String log() {
+		return null;
+	}
 }

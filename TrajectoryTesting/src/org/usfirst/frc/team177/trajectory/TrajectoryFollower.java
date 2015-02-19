@@ -1,5 +1,6 @@
 package org.usfirst.frc.team177.trajectory;
 
+
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //Blatantly stolen for ChezzyPoofs 2014 code
@@ -17,6 +18,7 @@ public class TrajectoryFollower {
   private double kv_;
   private double ka_;
   private double last_error_;
+  private double last_distance_so_far_;
   private double current_heading = 0;
   private int current_segment;
   private Trajectory profile_;
@@ -44,7 +46,7 @@ public class TrajectoryFollower {
   }
 
   public double calculate(double distance_so_far) {
-   
+	last_distance_so_far_ = distance_so_far;
     if (current_segment < profile_.getNumSegments()) {
       Trajectory.Segment segment = profile_.getSegment(current_segment);
       double error = segment.pos - distance_so_far;
@@ -55,15 +57,17 @@ public class TrajectoryFollower {
       last_error_ = error;
       current_heading = segment.heading;
       current_segment++;
-     // SmartDashboard.putNumber(name + "FollowerSensor", distance_so_far);
-     // SmartDashboard.putNumber(name + "FollowerGoal", segment.pos);
-     // SmartDashboard.putNumber(name + "FollowerError", error);
       return output;
     } else {
       return 0;
     }
   }
 
+  //Used for simulating and logging
+  public double getExpectedDistance() {
+	  return profile_.getSegment(current_segment).pos;
+  }
+  
   public double getHeading() {
     return current_heading;
   }
@@ -79,4 +83,13 @@ public class TrajectoryFollower {
   public int getNumSegments() {
     return profile_.getNumSegments();
   }
+
+	public String GetColumNames() {
+		return "last_error, current_segment, segment_distance, segment_vel, segment_accel, last_distance";
+	}
+	
+	
+	public String log() {
+		return String.format("%.2f,%d,%.2f,%.2f,%.2f,%.2f", last_error_, current_segment, profile_.getSegment(current_segment).pos, profile_.getSegment(current_segment).vel, profile_.getSegment(current_segment).acc, last_distance_so_far_);
+	}
 }

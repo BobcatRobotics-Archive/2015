@@ -4,6 +4,7 @@
 package org.usfirst.frc.team177.auto;
 
 import org.usfirst.frc.team177.robot.*;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -42,4 +43,15 @@ public class AutoModeDriveToTest extends AutoMode {
     public String getName() {
         return "DriveToTest";
     }
+
+	@Override
+	public String GetColumNames() {
+		return "distanceL, distanceR, speedLeft, speedRight, goalHeading, observedHeading, angleDiff, turn" + "," + followerLeft.GetColumNames();
+	}
+
+
+	@Override
+	public String log() {
+		return String.format("%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f", distanceL, distanceR, speedLeft, speedRight, goalHeading, observedHeading, angleDiff, turn) + "," + followerLeft.log();
+	}
 }

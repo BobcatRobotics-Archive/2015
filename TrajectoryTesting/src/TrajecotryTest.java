@@ -47,7 +47,6 @@ public class TrajecotryTest {
 	        double width = Constants.robotWidth.getDouble();
 	        double faster = (radius + (width / 2.0)) / radius;
 	        double slower = (radius - (width / 2.0)) / radius;
-	        System.out.println("faster " + faster);
 	
 	        if (deltaHeading > 0) {
 	          leftProfile.scale(faster);
@@ -65,9 +64,11 @@ public class TrajecotryTest {
         int loop = 0;
     	while(!followerLeft.isFinishedTrajectory())
     	{
-    		double distanceL = direction * 0; //robot.locator.getLeftEncoderDistance();
-    	    double distanceR = direction * 0; //robot.locator.getRightEncoderDistance();
-
+    		//simulate distance as expected +/- 5 randomly
+    		double distanceL = direction * followerLeft.getExpectedDistance() + ((Math.random()-0.5) * 1); //robot.locator.getLeftEncoderDistance();
+    	    double distanceR = direction * followerRight.getExpectedDistance() + ((Math.random()-0.5) * 1); //robot.locator.getRightEncoderDistance();
+    	    System.out.printf("%.2f %.2f, %.2f%n", followerLeft.getExpectedDistance() , distanceL, distanceR);
+    	    
     	    double speedLeft = direction * followerLeft.calculate(distanceL);
     	    double speedRight = direction * followerRight.calculate(distanceR);
     	      
@@ -79,7 +80,7 @@ public class TrajecotryTest {
 
     	    double turn = Constants.kTurn.getDouble() * angleDiff;
     	    //robot.drive.tankDrive(speedLeft + turn, speedRight - turn);
-    	    System.out.printf("%d: left: %f right: %f%n", loop++, speedLeft + turn, speedRight - turn);
+    	    System.out.printf("%d: left: %f right: %f %s%n", loop++, speedLeft + turn, speedRight - turn, followerLeft.log());
     	}
 	}
 

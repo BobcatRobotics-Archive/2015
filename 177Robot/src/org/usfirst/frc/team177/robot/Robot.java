@@ -10,14 +10,12 @@ import org.usfirst.frc.team177.lib.HTTPServer;
 import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -84,9 +82,6 @@ public class Robot extends IterativeRobot {
             
     public RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
        
-    /** Analog Input **/
-    AnalogInput shoulderPosition = new AnalogInput(AIShoulderPot);
-    
     /** Instantiate Joysticks **/
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
@@ -183,7 +178,17 @@ public class Robot extends IterativeRobot {
             auto.autoInit();
         }
     	if(logger != null) {
+    		logger.clear();
+    		logger.add(locator);
+    		logger.add(auto);
     		logger.start();
+    	}
+    }
+    
+    public void teleopInit()
+    {
+    	if(logger != null) {
+    		logger.stop();
     	}
     }
     
@@ -250,7 +255,7 @@ public class Robot extends IterativeRobot {
      */
 	public void teleopPeriodic() {
 		/** Shoulder Tilt **/
-		shoulder.set(operatorStick.getRawAxis(3)); 
+		shoulder.set(operatorStick.getRawAxis(1)); 
 		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
 		
 		/**Window Motor Control **/
@@ -266,8 +271,9 @@ public class Robot extends IterativeRobot {
 		}
 		
 		/** Stacking Controller bindings **/
-		pickupMotor1.set(operatorStick.getRawAxis(1));
-		pickupMotor2.set(operatorStick.getRawAxis(1));
+		pickupMotor1.set(operatorStick.getRawAxis(2));
+		pickupMotor2.set(operatorStick.getRawAxis(3));
+		
 		if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
 		}
@@ -278,14 +284,20 @@ public class Robot extends IterativeRobot {
 		
 		/** Stacker Anti-Failure Logic **/
 		lifter.set(lifterState);
+		
 		lowArmsPickup.set(lowArmsPickupState);
 		if(!lowArmsPickupState) {
 		 	highBoxPickup.set(highBoxPickupState);
+		} else {
+			highBoxPickup.set(false);
+		}
+		
+		if(operatorStick.getRawButton(10)) {
+			locator.Reset();
 		}
 		
 		/** Smart Dashboard **/
-		SmartDashboard.putNumber("Shoulder Position", shoulderPosition.getVoltage());
-		SmartDashboard.putNumber("Operator YAxis", operatorStick.getRawAxis(axisY));
+		SmartDashboard.putNumber("Shoulder Position", shoulder.getRawPosition());
 		
 		//Encoders maybe redundant here?
 		SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
