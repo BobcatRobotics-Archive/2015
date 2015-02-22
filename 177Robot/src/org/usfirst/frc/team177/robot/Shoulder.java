@@ -1,6 +1,7 @@
 package org.usfirst.frc.team177.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
@@ -9,13 +10,13 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
  */
 public class Shoulder extends PIDSubsystem {
 
-	Victor motor;
+	Talon motor;
 	AnalogInput pot;
 
     // Initialize your subsystem here
     public Shoulder(int MotorChannel, int PotChannel) {
     	super(Constants.shoulderKp.getDouble(), Constants.shoulderKi.getDouble(), Constants.shoulderKd.getDouble());
-    	motor = new Victor(MotorChannel);
+    	motor = new Talon(MotorChannel);
     	pot = new AnalogInput(PotChannel);
     	setSetpoint(getPosition());
     	if(Constants.shoulderEnableControl.getDouble() > 0)

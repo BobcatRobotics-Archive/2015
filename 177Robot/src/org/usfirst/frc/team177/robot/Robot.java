@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -41,10 +42,10 @@ public class Robot extends IterativeRobot {
     private static final int MotorSlide1 = 6;
     private static final int MotorSlide2 = 7;
   
-    private static final int MotorPickup1 = 5;
+    private static final int MotorPickup1 = 5; 
     private static final int MotorPickup2 = 9;
     
-    private static final int MotorShoulderTilt = 8;
+    private static final int MotorShoulderTilt = 8; 
     
     /** Relay Motors **/
     private static final int ClawMotor1 = 0;
@@ -67,11 +68,14 @@ public class Robot extends IterativeRobot {
     Victor slideMotor1 = new Victor(MotorSlide1);
     Victor slideMotor2 = new Victor(MotorSlide2);
     
-    public Victor pickupMotor1 = new Victor(MotorPickup1);
-    public Victor pickupMotor2 = new Victor(MotorPickup2);
-        
+    //public Victor pickupMotor1 = new Victor(MotorPickup1);
+    //public Victor pickupMotor2 = new Victor(MotorPickup2);
+    public Talon pickupMotor1 = new Talon(MotorPickup1);
+    public Talon pickupMotor2 = new Talon(MotorPickup2);
+    
     /** Shoulder **/
-    public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
+    //public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
+    public Talon shoulder = new Talon(MotorShoulderTilt);
     
     /** Relays **/
     Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
@@ -93,6 +97,7 @@ public class Robot extends IterativeRobot {
     public Solenoid lowArmsPickup = new Solenoid(1);
     public Solenoid highBoxPickup = new Solenoid(2);
     public Solenoid shoulderTiltPneumatic = new Solenoid(3);
+    public Solenoid clawPneumatic = new Solenoid(4);
     
     /* Automode Variables */
     int autoMode = 0;
@@ -204,8 +209,8 @@ public class Robot extends IterativeRobot {
     }
     
     public void disabledPeriodic() {
-    	SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-    	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
+    	//SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+    	//SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		SmartDashboard.putBoolean("Tote Sensor", toteSensor.get());
@@ -235,6 +240,8 @@ public class Robot extends IterativeRobot {
 				    	auto = null;
 				    	break;
 			    }
+				
+				
     		}
             autoDelay = 0; //(inputs.getX() + 1.0f)*10.0f;  //-1 to 1 gives you a range 0 - 20
         } catch (Exception e) {
@@ -257,6 +264,7 @@ public class Robot extends IterativeRobot {
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1)); 
 		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
+		clawPneumatic.set(operatorStick.getRawButton(1)); 
 		
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
@@ -271,16 +279,33 @@ public class Robot extends IterativeRobot {
 		}
 		
 		/** Stacking Controller bindings **/
-		pickupMotor1.set(operatorStick.getRawAxis(2));
+		pickupMotor1.set(operatorStick.getRawAxis(3));
 		pickupMotor2.set(operatorStick.getRawAxis(3));
+		//pickupMotor2.set(operatorStick.getRawAxis(3));
 		
-		if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
+		
+		if (operatorStick.getRawButton(3)) {
 			lowArmsPickupState = true;
+		} else {
+			lowArmsPickupState = false;
+		}
+		if (operatorStick.getRawButton(2)) {
+			highBoxPickupState = true;
+		} else {
+			highBoxPickupState = false;
+		}
+		/*if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
+			lowArmsPickupState = true;
+		} else {
+			lowArmsPickupState = false;
 		}
 		lifterState = operatorStick.getRawButton(5);
 		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
 			highBoxPickupState = true;
+		} else {
+			highBoxPickupState = false;
 		}
+		*/
 		
 		/** Stacker Anti-Failure Logic **/
 		lifter.set(lifterState);
@@ -297,7 +322,8 @@ public class Robot extends IterativeRobot {
 		}
 		
 		/** Smart Dashboard **/
-		SmartDashboard.putNumber("Shoulder Position", shoulder.getRawPosition());
+		//SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+    	//SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
 		
 		//Encoders maybe redundant here?
 		SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
@@ -318,7 +344,7 @@ public class Robot extends IterativeRobot {
 				slide = rightStick.getRawAxis(axisX); 								
 				break;
 			case SlideControllerDrive:
-				slide = operatorStick.getRawAxis(0);
+				/*slide = operatorStick.getRawAxis(0);
 				left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
 	    		right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
 	    		if (left > right) {
@@ -333,7 +359,7 @@ public class Robot extends IterativeRobot {
 	    				left = scale * left;
 	    				right = scale * right;
 	    			}
-	    		}
+	    		}*/
 				break;
 			case SlideJoyStickDrive:
 				slide = leftStick.getRawAxis(axisX);				
@@ -355,10 +381,10 @@ public class Robot extends IterativeRobot {
 				
 				break;
 			case TankControllerDrive:
-				left = operatorStick.getRawAxis(1);
+				/*left = operatorStick.getRawAxis(1);
 				right = operatorStick.getRawAxis(3);
 				slide = operatorStick.getRawAxis(0);				
-				break;
+				break;*/
 			default:
 				break;
 		}

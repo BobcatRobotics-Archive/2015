@@ -23,7 +23,7 @@ public class AutoModePickupCan extends AutoMode {
         	   //Raise shoulder to 25%
         	   //This requires the automatic position control to work
         	   //May need a delay
-        	   robot.shoulder.setTargetPosition(0.25);
+        	  // robot.shoulder.setTargetPosition(0.25);
         	   StepCount++;
         	   break;         	  
            case 2:
