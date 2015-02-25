@@ -90,7 +90,8 @@ public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
-    Joystick launchpad =  new Joystick(3);
+    //Joystick launchpad =  new Joystick(3);
+    Joystick driverController = new Joystick(3);
     
     /** Pneumatics **/ 
     public Solenoid lifter = new Solenoid(0);
@@ -208,20 +209,22 @@ public class Robot extends IterativeRobot {
         }
     }
     
-    public void disabledPeriodic() {
+    //public void disabledPeriodic() {
+    	/*
     	//SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
     	//SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		SmartDashboard.putBoolean("Tote Sensor", toteSensor.get());
 		
+		
 		try {
     		int new_automode = (launchpad.getRawButton(1) ? 0 : 4) + (launchpad.getRawButton(2) ? 0 : 2) + (launchpad.getRawButton(3) ? 0 : 1);
     		if (new_automode != autoMode)
     		{
     			autoMode = new_automode;
-    			/* Add automodes here:
-    			 */
+    			//Add automodes here:
+    			 
 				switch (autoMode)
 				{
 				    case 1:
@@ -239,7 +242,7 @@ public class Robot extends IterativeRobot {
 				    default:
 				    	auto = null;
 				    	break;
-			    }
+			    } 
 				
 				
     		}
@@ -260,9 +263,10 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during operator control
      */
+    	
 	public void teleopPeriodic() {
 		/** Shoulder Tilt **/
-		shoulder.set(operatorStick.getRawAxis(1)); 
+		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
 		clawPneumatic.set(operatorStick.getRawButton(1)); 
 		
@@ -294,12 +298,13 @@ public class Robot extends IterativeRobot {
 		} else {
 			highBoxPickupState = false;
 		}
+		lifterState = operatorStick.getRawButton(5);
 		/*if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
 		} else {
 			lowArmsPickupState = false;
 		}
-		lifterState = operatorStick.getRawButton(5);
+		
 		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
 			highBoxPickupState = true;
 		} else {
@@ -344,9 +349,9 @@ public class Robot extends IterativeRobot {
 				slide = rightStick.getRawAxis(axisX); 								
 				break;
 			case SlideControllerDrive:
-				/*slide = operatorStick.getRawAxis(0);
-				left = operatorStick.getRawAxis(1)  - operatorStick.getRawAxis(2);
-	    		right = operatorStick.getRawAxis(1) + operatorStick.getRawAxis(2);
+				slide = driverController.getRawAxis(0);
+				left = driverController.getRawAxis(1)  - driverController.getRawAxis(4);
+	    		right = driverController.getRawAxis(1) + driverController.getRawAxis(4);
 	    		if (left > right) {
 	    			if (left > 1) {
 	    				double scale = 1 / left;
@@ -359,7 +364,7 @@ public class Robot extends IterativeRobot {
 	    				left = scale * left;
 	    				right = scale * right;
 	    			}
-	    		}*/
+	    		}
 				break;
 			case SlideJoyStickDrive:
 				slide = leftStick.getRawAxis(axisX);				
@@ -381,10 +386,10 @@ public class Robot extends IterativeRobot {
 				
 				break;
 			case TankControllerDrive:
-				/*left = operatorStick.getRawAxis(1);
-				right = operatorStick.getRawAxis(3);
-				slide = operatorStick.getRawAxis(0);				
-				break;*/
+				left = driverController.getRawAxis(1);
+				right = driverController.getRawAxis(5);
+				slide = driverController.getRawAxis(0);				
+				break;
 			default:
 				break;
 		}
