@@ -10,6 +10,7 @@ import org.usfirst.frc.team177.lib.HTTPServer;
 import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -57,6 +58,7 @@ public class Robot extends IterativeRobot {
        
     /** Analog IO**/
     private static final int AIShoulderPot = 1;
+    //AnalogInput pot = new AnalogInput(AIShoulderPot);
     
     /** Motor Controllers **/
     Victor rearLeftMotor = new Victor(MotorDriveRL);
@@ -74,8 +76,8 @@ public class Robot extends IterativeRobot {
     public Talon pickupMotor2 = new Talon(MotorPickup2);
     
     /** Shoulder **/
-    //public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
-    public Talon shoulder = new Talon(MotorShoulderTilt);
+    public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
+    //public Talon shoulder = new Talon(MotorShoulderTilt);
     
     /** Relays **/
     Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
@@ -90,14 +92,14 @@ public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
-    //Joystick launchpad =  new Joystick(3);
+    Joystick launchpad =  new Joystick(4);
     Joystick driverController = new Joystick(3);
     
     /** Pneumatics **/ 
     public Solenoid lifter = new Solenoid(0);
     public Solenoid lowArmsPickup = new Solenoid(1);
     public Solenoid highBoxPickup = new Solenoid(2);
-    public Solenoid shoulderTiltPneumatic = new Solenoid(3);
+    public Solenoid holder = new Solenoid(3);
     public Solenoid clawPneumatic = new Solenoid(4);
     
     /* Automode Variables */
@@ -113,6 +115,9 @@ public class Robot extends IterativeRobot {
     
     //Logger
     private Logger logger = new Logger();
+    
+    /* Time Tracking */
+    long upStartTime = 0;
     
        
     SendableChooser driveModeChooser;
@@ -209,10 +214,12 @@ public class Robot extends IterativeRobot {
         }
     }
     
-    //public void disabledPeriodic() {
-    	/*
-    	//SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-    	//SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
+  
+    
+    public void disabledPeriodic() {
+    	
+    	SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+    	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		SmartDashboard.putBoolean("Tote Sensor", toteSensor.get());
@@ -267,7 +274,6 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
-		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
 		clawPneumatic.set(operatorStick.getRawButton(1)); 
 		
 		/**Window Motor Control **/
@@ -298,7 +304,17 @@ public class Robot extends IterativeRobot {
 		} else {
 			highBoxPickupState = false;
 		}
-		lifterState = operatorStick.getRawButton(5);
+		
+		if (operatorStick.getRawButton(5)) {
+			holder.set(false);
+			lifter.set(false);
+			upStartTime = System.currentTimeMillis();
+		} else {
+			lifter.set(true);
+			if (System.currentTimeMillis() - upStartTime == Constants.holderTimeOut.getDouble()) {
+				holder.set(true);
+			}
+		}
 		/*if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
 		} else {
@@ -313,24 +329,24 @@ public class Robot extends IterativeRobot {
 		*/
 		
 		/** Stacker Anti-Failure Logic **/
-		lifter.set(lifterState);
 		
 		lowArmsPickup.set(lowArmsPickupState);
-		if(!lowArmsPickupState) {
+		highBoxPickup.set(highBoxPickupState);
+		/*if(!lowArmsPickupState) {
 		 	highBoxPickup.set(highBoxPickupState);
 		} else {
 			highBoxPickup.set(false);
 		}
-		
+		*/
 		if(operatorStick.getRawButton(10)) {
 			locator.Reset();
 		}
 		
 		/** Smart Dashboard **/
-		//SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-    	//SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
+		SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+    	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
 		
-		//Encoders maybe redundant here?
+		//Encoders maybe redundant here? 
 		SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
 		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
 		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
@@ -395,7 +411,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//If the shift switch is set reverse the orientation of the robot
-		if(leftStick.getRawButton(3))
+		if(rightStick.getRawButton(3))
 		{
 			double temp = left;
 			left = -1.0 * right;

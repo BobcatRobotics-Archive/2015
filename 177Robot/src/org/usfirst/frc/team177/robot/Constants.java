@@ -5,16 +5,12 @@ import org.usfirst.frc.team177.lib.*;
 public class Constants extends ConstantsBase {
 
 	/** Shoulder Config **/
-	public static final Constant shoulderMinV = new Constant("shoulderMinV", 0.0);
-	public static final Constant shoulderMaxV = new Constant("shoulderMaxV", 4.7);
-	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 0.90);
-	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.10);	
-	public static final Constant shoulderKp = new Constant("shoulderKp", 0);
-	public static final Constant shoulderKi = new Constant("shoulderKi", 0);
-	public static final Constant shoulderKd = new Constant("shoulderKd", 0);
-	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 0);
-	public static final Constant shoulderEnableControl = new Constant("shoulderEnableControl", 0);
-	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.1);
+	public static final Constant shoulderMinV = new Constant("shoulderMinV", 0.72);
+	public static final Constant shoulderMaxV = new Constant("shoulderMaxV", 2.98);
+	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 0.72);
+	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 2.98);
+	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 1);
+	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.0);
 	
 	/** Encoders **/
 	public static final Constant DIOLeftEncoderA = new Constant("DIOLeftEncoderA", 0);
@@ -55,5 +51,8 @@ public class Constants extends ConstantsBase {
     
     /** Logging **/
     public static final Constant loggingDt = new Constant("LoggingDt", 100);
+    
+    /** Time Keeping **/
+    public static final Constant holderTimeOut = new Constant("Holder Time Out", 500);
     
 }
