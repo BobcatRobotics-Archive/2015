@@ -313,7 +313,7 @@ public class Robot extends IterativeRobot {
 		} else {
 			lowArmsPickupState = false;
 		}
-		lifterState = operatorStick.getRawButton(5);
+        if (operatorStick.getRawButton(2)) {
 			highBoxPickupState = true;
 		} else {
 			highBoxPickupState = false;

@@ -7,16 +7,16 @@ import edu.wpi.first.wpilibj.Victor;
 /**
  *
  */
-public class Shoulder{
+public class Shoulder {
 
 	Talon motor;
 	AnalogInput pot;
 
     // Initialize your subsystem here
     public Shoulder(int MotorChannel, int PotChannel) {
-    motor = new Talon(MotorChannel);
+    	motor = new Talon(MotorChannel);
     	pot = new AnalogInput(PotChannel);
-    	
+    }
     
     /** Return position as a % of full travel **/
     public double getPosition() 

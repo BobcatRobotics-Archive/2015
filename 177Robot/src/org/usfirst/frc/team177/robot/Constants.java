@@ -52,4 +52,9 @@ public class Constants extends ConstantsBase {
     /** Logging **/
     public static final Constant loggingDt = new Constant("LoggingDt", 100);
     
+    
+    /** Time Keeping **/
+    public static final Constant holderTimeOut = new Constant("Holder Time Out", 500);
+
+    
 }
