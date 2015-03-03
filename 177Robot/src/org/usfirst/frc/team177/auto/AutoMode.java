@@ -33,13 +33,13 @@ public abstract class AutoMode implements Logable {
     private static double SteerMargin = 5.0; //Margin to consider robot facing target (degrees)
     private static double DriveMargin = 10.0; //Margin to consider the robot at target (in)
     
-    private static double DriveP = 0.25;  //Preportial gain for Drive System
-    private static double DriveI = 0.0;   //Integral gain for Drive System
+    private static double DriveP = 0.3;  //Preportial gain for Drive System
+    private static double DriveI = 0.01;   //Integral gain for Drive System
     private static double DriveD = 0.0;   //Derivative gain for Drive System
     private static double DriveMax = 1;   //Max Saturation value for control
     private static double DriveMin = -1;  //Min Saturation value for control
     
-    private static double SteerP = 0.01; //0.02;  //Preportial gain for Steering System
+    private static double SteerP = 0.02; //0.02;  //Preportial gain for Steering System
     private static double SteerI = 0.01; //0.01 //Integral gain for Steering System
     private static double SteerD = 0.00;  //Derivative gain for Steering System
     private static double SteerMax = 1;   //Max Saturation value for control
@@ -141,7 +141,13 @@ public abstract class AutoMode implements Logable {
         //System.out.println("bearing: "+bearing);
         /* Steering PID Control */
         steer = SteerPID.calculate(bearing, dT);
+        if(steer > 0.15) {
+        	steer = 0.15;
+        } else if(steer < -0.15) {
+        	steer = -0.15;
+        }
         //System.out.println("BEARING: "+bearing);
+        steer = 0;
         
         /* Drive PID Control */                
         if(speed == 0) {
@@ -152,8 +158,8 @@ public abstract class AutoMode implements Logable {
         }        
 
         //Move the robot - Would this work better if we multiplyed by the steering PID output?
-        //System.out.println("DRIVE: "+drive);
-        //System.out.println("STEER: "+steer);
+        System.out.println("DRIVE: "+drive);
+        System.out.println("STEER: "+steer);
         robot.drive.tankDrive(drive+steer, drive-steer);
 
                 
@@ -183,7 +189,7 @@ public abstract class AutoMode implements Logable {
      * @return - Boolean value indicating if the robot is at the target or not (true = at target).
      * @author schroed
      */     
-    public boolean DriveToToTrajectory(double x, double y, double goal_heading) 
+    public boolean DriveToTrajectory(double x, double y, double goal_heading) 
     {
     	//Reinitalize if the target has changed
         if(x != lastTargetX || y != lastTargetY) {

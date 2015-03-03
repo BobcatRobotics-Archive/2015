@@ -1,46 +1,23 @@
 package org.usfirst.frc.team177.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 /**
  *
  */
-public class Shoulder extends PIDSubsystem {
+public class Shoulder{
 
-	Victor motor;
+	Talon motor;
 	AnalogInput pot;
 
     // Initialize your subsystem here
     public Shoulder(int MotorChannel, int PotChannel) {
-    	super(Constants.shoulderKp.getDouble(), Constants.shoulderKi.getDouble(), Constants.shoulderKd.getDouble());
-    	motor = new Victor(MotorChannel);
+    motor = new Talon(MotorChannel);
     	pot = new AnalogInput(PotChannel);
-    	setSetpoint(getPosition());
-    	if(Constants.shoulderEnableControl.getDouble() > 0)
-    	{
-    		//Control is enabled, start the PID Controller
-    		enable();
-    	}
-    }
-    
-    public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        //setDefaultCommand(new MySpecialCommand());
-    }
-    
-    protected double returnPIDInput() {
-        // Return your input value for the PID loop
-        // e.g. a sensor, like a potentiometer:
-        // yourPot.getAverageVoltage() / kYourMaxVoltage;
-    	return getPosition();
-    }
-    
-    protected void usePIDOutput(double output) {
-        // Use output to drive your system, like a motor
-        // e.g. yourMotor.set(output);
-    	set(output, true);
+    	
     }
     
     /** Return position as a % of full travel **/
@@ -57,39 +34,19 @@ public class Shoulder extends PIDSubsystem {
         
     public void set(double setpoint)
     {
-    	//Helper function to set motor from teleop code
-    	set(setpoint, false);
-    }
-    
-    public void set(double setpoint, boolean PIDInput)
-    {
-    	//Dead band
-    	if(Math.abs(setpoint) < Constants.shoulderDeadband.getDouble())
+      	//Dead band
+    	if(Math.abs(setpoint) > Constants.shoulderDeadband.getDouble())
     	{
     		//Limit logic
     		if((Constants.shoulderEnableLimits.getDouble()<1)
-    	        || (setpoint > 0 && getPosition() < Constants.shoulderLimitUp.getDouble())
-    			|| (setpoint < 0 && getPosition() > Constants.shoulderLimitDown.getDouble()))
-    		{
-    			if(!PIDInput && Constants.shoulderEnableControl.getDouble() > 0)
-    	    	{
-    	    		//Control is enabled, stop the control if this is manual input
-    	    		disable();
-    	    	}
+    	        || (setpoint > 0 && getRawPosition() < Constants.shoulderLimitUp.getDouble())
+    			|| (setpoint < 0 && getRawPosition() > Constants.shoulderLimitDown.getDouble()))
+    		{		
     			motor.set(setpoint);	
     		}
     		else
     		{
     			motor.set(0);
-    			if(!PIDInput) {
-    				//Update our target position if the operator moved the arm
-    				setSetpoint(getPosition());
-    				if(Constants.shoulderEnableControl.getDouble() > 0)
-    		    	{
-    		    		//Control is enabled, start the PID Controller
-    		    		enable();
-    		    	}
-    			}
     		}
     	}
     	else
@@ -98,9 +55,4 @@ public class Shoulder extends PIDSubsystem {
     	}    
     }
     
-    /** directly set the target control position, this should be useful for auto **/
-    public void setTargetPosition(double target)
-    {    	
-    	setSetpoint(target);
-    }
 }

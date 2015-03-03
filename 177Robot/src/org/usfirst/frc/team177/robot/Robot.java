@@ -3,9 +3,13 @@ package org.usfirst.frc.team177.robot;
 
 import org.usfirst.frc.team177.auto.AutoMode;
 import org.usfirst.frc.team177.auto.AutoMode3Totes;
+import org.usfirst.frc.team177.auto.AutoModeCanAndTote;
+import org.usfirst.frc.team177.auto.AutoModeCanSlide;
+import org.usfirst.frc.team177.auto.AutoModeDriveForward;
 import org.usfirst.frc.team177.auto.AutoModeDriveTest;
 import org.usfirst.frc.team177.auto.AutoModeDriveToTest;
 import org.usfirst.frc.team177.auto.AutoModePickupCan;
+import org.usfirst.frc.team177.auto.AutoModeToteTunr90java;
 import org.usfirst.frc.team177.lib.HTTPServer;
 import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
@@ -64,8 +68,8 @@ public class Robot extends IterativeRobot {
     Victor rearRightMotor = new Victor(MotorDriveRR);
     Victor frontRightMotor = new Victor(MotorDriveFR); 
     
-    Victor slideMotor1 = new Victor(MotorSlide1);
-    Victor slideMotor2 = new Victor(MotorSlide2);
+    public Victor slideMotor1 = new Victor(MotorSlide1);
+    public Victor slideMotor2 = new Victor(MotorSlide2);
     
     public Victor pickupMotor1 = new Victor(MotorPickup1);
     public Victor pickupMotor2 = new Victor(MotorPickup2);
@@ -93,6 +97,7 @@ public class Robot extends IterativeRobot {
     public Solenoid lowArmsPickup = new Solenoid(1);
     public Solenoid highBoxPickup = new Solenoid(2);
     public Solenoid shoulderTiltPneumatic = new Solenoid(3);
+    public Solenoid claw = new Solenoid(4);
     
     /* Automode Variables */
     int autoMode = 0;
@@ -220,16 +225,16 @@ public class Robot extends IterativeRobot {
 				switch (autoMode)
 				{
 				    case 1:
-				    	auto = new AutoModeDriveTest(this);
+				    	auto = new AutoModeCanSlide(this);
 				    	break;
 				    case 2:
-				    	auto = new AutoModeDriveToTest(this);
+				    	auto = new AutoModeCanAndTote(this);
 				    	break;
 				    case 3:
-				    	auto = new AutoModePickupCan(this);
+				    	auto = new AutoModeDriveForward(this);
 				    	break;
 				    case 4:
-				    	auto = new AutoMode3Totes(this);
+				    	auto = new AutoModeToteTunr90java(this);
 				    	break;
 				    default:
 				    	auto = null;
@@ -257,6 +262,7 @@ public class Robot extends IterativeRobot {
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1)); 
 		shoulderTiltPneumatic.set(operatorStick.getRawButton(4));    //Untested might not work
+		claw.set(operatorStick.getRawButton(1));
 		
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
@@ -276,13 +282,23 @@ public class Robot extends IterativeRobot {
 		
 		if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
-		}
-		lifterState = operatorStick.getRawButton(5);
-		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
-			highBoxPickupState = true;
+		} else {
+			lowArmsPickupState = false;
 		}
 		
+		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
+			highBoxPickupState = true;
+		} else  {
+			highBoxPickupState = false;
+		}
+		
+		
+		//lowArmsPickup.set(operatorStick.getRawButton(1));
+		//highBoxPickup.set(operatorStick.getRawButton(2));
+		
+		
 		/** Stacker Anti-Failure Logic **/
+		lifterState = operatorStick.getRawButton(5);
 		lifter.set(lifterState);
 		
 		lowArmsPickup.set(lowArmsPickupState);
