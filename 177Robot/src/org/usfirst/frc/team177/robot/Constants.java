@@ -7,8 +7,8 @@ public class Constants extends ConstantsBase {
 	/** Shoulder Config **/
 	public static final Constant shoulderMinV = new Constant("shoulderMinV", 0.72);
 	public static final Constant shoulderMaxV = new Constant("shoulderMaxV", 2.98);
-	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 0.72);
-	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 2.98);
+	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 2.98);
+	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.72);
 	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 1);
 	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.0);
 	

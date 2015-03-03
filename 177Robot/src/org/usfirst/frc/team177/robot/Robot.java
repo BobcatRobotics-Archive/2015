@@ -70,14 +70,14 @@ public class Robot extends IterativeRobot {
     Victor slideMotor1 = new Victor(MotorSlide1);
     Victor slideMotor2 = new Victor(MotorSlide2);
     
-    //public Victor pickupMotor1 = new Victor(MotorPickup1);
-    //public Victor pickupMotor2 = new Victor(MotorPickup2);
-    public Talon pickupMotor1 = new Talon(MotorPickup1);
-    public Talon pickupMotor2 = new Talon(MotorPickup2);
+    public Victor pickupMotor1 = new Victor(MotorPickup1);
+    public Victor pickupMotor2 = new Victor(MotorPickup2);
+    //public Talon pickupMotor1 = new Talon(MotorPickup1);
+    //public Talon pickupMotor2 = new Talon(MotorPickup2);
     
     /** Shoulder **/
     public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
-    //public Talon shoulder = new Talon(MotorShoulderTilt);
+
     
     /** Relays **/
     Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
@@ -101,6 +101,11 @@ public class Robot extends IterativeRobot {
     public Solenoid highBoxPickup = new Solenoid(2);
     public Solenoid holder = new Solenoid(3);
     public Solenoid clawPneumatic = new Solenoid(4);
+    public Solenoid lowArmsLift = new Solenoid(5);
+    
+    /** State Variables **/
+    boolean armLiftStateLast = false;
+    boolean armLiftStateNow = false;
     
     /* Automode Variables */
     int autoMode = 0;
@@ -272,6 +277,15 @@ public class Robot extends IterativeRobot {
      */
     	
 	public void teleopPeriodic() {
+		
+		if(armLiftStateLast == false && operatorStick.getRawButton(7) == true) {
+			armLiftStateNow = !armLiftStateNow;
+			lowArmsLift.set(armLiftStateNow);
+			armLiftStateLast = true;
+		} else {
+			armLiftStateLast = false;
+			 
+		 }
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		clawPneumatic.set(operatorStick.getRawButton(1)); 
@@ -311,7 +325,7 @@ public class Robot extends IterativeRobot {
 			upStartTime = System.currentTimeMillis();
 		} else {
 			lifter.set(true);
-			if (System.currentTimeMillis() - upStartTime == Constants.holderTimeOut.getDouble()) {
+			if (System.currentTimeMillis() - upStartTime > Constants.holderTimeOut.getDouble()) {
 				holder.set(true);
 			}
 		}
