@@ -112,6 +112,8 @@ public class Locator implements Logable {
             double lastRight = 0;
             double left, right;
             double slide1, slide2;
+            double lastSlide1 = 0;
+            double lastSlide2 = 0;
     		long startTime; 
     		
             
@@ -141,10 +143,10 @@ public class Locator implements Logable {
                 
                 /* Factor in slide drive */
                 slide1 = slide1Encoder.getDistance();
-                slide2 = slide2Encoder.getDistance();
+                slide2 = slide2Encoder.getDistance();  //there is no slide2 on practice bot
                 //TODO - average these?
-                deltax += slide1 * Math.sin(Math.toRadians(heading));
-                deltay += slide1 * Math.cos(Math.toRadians(heading));
+                deltax += (lastSlide1-slide1) * Math.sin(Math.toRadians(heading));
+                deltay += (lastSlide1-slide1) * Math.cos(Math.toRadians(heading));
 
                 /* Update Location */
                 x += deltax;
@@ -153,6 +155,8 @@ public class Locator implements Logable {
                 /* Update history variables */
                 lastLeft = left;
                 lastRight = right;
+                lastSlide1 = slide1;
+                lastSlide2 = slide2;
                 
                 SmartDashboard.putNumber("x", x);
                 SmartDashboard.putNumber("y", y);

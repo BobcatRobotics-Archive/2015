@@ -20,13 +20,17 @@ public class AutoModePickupCan extends AutoMode {
         	   StepCount++;
         	   break;
            case 1: 
-        	   //Raise shoulder to 25%
-        	   //This requires the automatic position control to work
-        	   //May need a delay
-        	  // robot.shoulder.setTargetPosition(0.25);
+        	   //Raise shoulder to 10%
+        	   robot.shoulder.set(1);
         	   StepCount++;
         	   break;         	  
            case 2:
+        	   if(robot.shoulder.getPosition() > 10) {
+        		   robot.shoulder.set(0);
+        		   StepCount++;
+        	   }
+        	   break;	   
+           case 3:
                //Drive forward for approx 1/2 second
         	   //TODO - make this use the Drive to logic
                robot.drive.tankDrive(-0.5,-0.5);
@@ -36,7 +40,7 @@ public class AutoModePickupCan extends AutoMode {
                }
                SubStepCount++;
                break;
-           case 3:
+           case 4:
                StepCount++;
                robot.drive.tankDrive(0,0);
                break;

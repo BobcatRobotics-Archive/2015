@@ -11,13 +11,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * @author schroed
  */
-public class AutoModeDriveToTest extends AutoMode {
+public class AutoModeToteTunr90java extends AutoMode {
     
     private int StepCount = 0;
+    private long lastMs =0;
 
-    public AutoModeDriveToTest(Robot robot) {
+    public AutoModeToteTunr90java(Robot robot) {
         super(robot);
-        System.out.println("AutoModeDriveToTest Constructor");
+        System.out.println("AutoModeToteTunr90java Constructor");
     }
     
     
@@ -30,12 +31,29 @@ public class AutoModeDriveToTest extends AutoMode {
     public void autoPeriodic() {
         switch(StepCount) {
             case 0:
-                //Drive Forward 3 feet
-                if(DriveTo(36,0,1)) {
-            	//if(DriveToTrajectory(36, 0, 0)){
-                    StepCount++;
-                }
-                break;
+            	robot.lifter.set(true);
+            	lastMs = System.currentTimeMillis();
+            	StepCount++;
+            	break;
+            case 1:
+            	if(System.currentTimeMillis() - lastMs > 200) {
+            		StepCount++;
+            	}
+            	break;
+            case 2:
+            	robot.drive.tankDrive(-0.5,0.5);
+            	if(robot.locator.GetHeading() > 80 && robot.locator.GetHeading() < 92) {
+            		robot.drive.tankDrive(0.0,0.0);
+            		StepCount++;
+            	}
+            	break;
+            case 3:
+            	robot.drive.tankDrive(-0.8,-0.8);
+            	if(robot.locator.GetY() < -180) {
+            		robot.drive.tankDrive(0.0,0.0);
+            		StepCount++;
+            	}
+            	break;
             default:
                 robot.drive.tankDrive(0.0,0.0);
         }
@@ -43,7 +61,7 @@ public class AutoModeDriveToTest extends AutoMode {
     }
        
     public String getName() {
-        return "DriveToTest";
+        return "Tote Turn 90";
     }
 
 	@Override

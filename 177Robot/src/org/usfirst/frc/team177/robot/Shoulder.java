@@ -7,18 +7,16 @@ import edu.wpi.first.wpilibj.Victor;
 /**
  *
  */
-public class Shoulder {
-	//Talon motor
-	Victor motor;
+public class Shoulder{
+
+	Talon motor;
 	AnalogInput pot;
 
     // Initialize your subsystem here
     public Shoulder(int MotorChannel, int PotChannel) {
-    	//motor = new Talon(MotorChannel);
-    	motor = new Victor(MotorChannel);
+    motor = new Talon(MotorChannel);
     	pot = new AnalogInput(PotChannel);
-    }
-    
+    	
     
     /** Return position as a % of full travel **/
     public double getPosition() 
@@ -35,14 +33,14 @@ public class Shoulder {
     
     public void set(double setpoint)
     {
-    	//Dead band
+      	//Dead band
     	if(Math.abs(setpoint) > Constants.shoulderDeadband.getDouble())
     	{
     		//Limit logic
     		if((Constants.shoulderEnableLimits.getDouble()<1)
     	        || (setpoint > 0 && getRawPosition() < Constants.shoulderLimitUp.getDouble())
     			|| (setpoint < 0 && getRawPosition() > Constants.shoulderLimitDown.getDouble()))
-    		{
+    		{		
     			motor.set(setpoint);	
     		}
     		else

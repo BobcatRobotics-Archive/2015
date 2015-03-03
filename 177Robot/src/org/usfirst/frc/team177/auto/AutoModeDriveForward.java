@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * @author schroed
  */
-public class AutoModeDriveToTest extends AutoMode {
+public class AutoModeDriveForward extends AutoMode {
     
     private int StepCount = 0;
 
-    public AutoModeDriveToTest(Robot robot) {
+    public AutoModeDriveForward(Robot robot) {
         super(robot);
-        System.out.println("AutoModeDriveToTest Constructor");
+        System.out.println("AutoModeDriveForward Constructor");
     }
     
     
@@ -30,12 +30,23 @@ public class AutoModeDriveToTest extends AutoMode {
     public void autoPeriodic() {
         switch(StepCount) {
             case 0:
-                //Drive Forward 3 feet
-                if(DriveTo(36,0,1)) {
-            	//if(DriveToTrajectory(36, 0, 0)){
-                    StepCount++;
-                }
-                break;
+            /*	robot.shoulder.set(1);
+            	if(robot.shoulder.getRawPosition() > 1.2) {
+            		robot.shoulder.set(0);
+            		StepCount++;
+            	}
+            	break;
+            case 1:*/
+            	robot.drive.tankDrive(-0.8,-0.8);
+            	if(robot.locator.GetY() < -160) {
+            		robot.drive.tankDrive(0.0,0.0);
+            		StepCount++;
+            	}
+            	/*if(DriveTo(150, 0, 1)) {
+            		robot.drive.tankDrive(0.0,0.0);
+            		StepCount++;
+            	}*/
+            	break;
             default:
                 robot.drive.tankDrive(0.0,0.0);
         }
@@ -43,7 +54,7 @@ public class AutoModeDriveToTest extends AutoMode {
     }
        
     public String getName() {
-        return "DriveToTest";
+        return "DriveForward";
     }
 
 	@Override

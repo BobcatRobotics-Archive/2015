@@ -3,14 +3,17 @@ package org.usfirst.frc.team177.robot;
 
 import org.usfirst.frc.team177.auto.AutoMode;
 import org.usfirst.frc.team177.auto.AutoMode3Totes;
+import org.usfirst.frc.team177.auto.AutoModeCanAndTote;
+import org.usfirst.frc.team177.auto.AutoModeCanSlide;
+import org.usfirst.frc.team177.auto.AutoModeDriveForward;
 import org.usfirst.frc.team177.auto.AutoModeDriveTest;
 import org.usfirst.frc.team177.auto.AutoModeDriveToTest;
 import org.usfirst.frc.team177.auto.AutoModePickupCan;
+import org.usfirst.frc.team177.auto.AutoModeToteTunr90java;
 import org.usfirst.frc.team177.lib.HTTPServer;
 import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -58,7 +61,6 @@ public class Robot extends IterativeRobot {
        
     /** Analog IO**/
     private static final int AIShoulderPot = 1;
-    //AnalogInput pot = new AnalogInput(AIShoulderPot);
     
     /** Motor Controllers **/
     Victor rearLeftMotor = new Victor(MotorDriveRL);
@@ -67,14 +69,12 @@ public class Robot extends IterativeRobot {
     Victor rearRightMotor = new Victor(MotorDriveRR);
     Victor frontRightMotor = new Victor(MotorDriveFR); 
     
-    Victor slideMotor1 = new Victor(MotorSlide1);
-    Victor slideMotor2 = new Victor(MotorSlide2);
+    public Victor slideMotor1 = new Victor(MotorSlide1);
+    public Victor slideMotor2 = new Victor(MotorSlide2);
     
     public Victor pickupMotor1 = new Victor(MotorPickup1);
     public Victor pickupMotor2 = new Victor(MotorPickup2);
-    //public Talon pickupMotor1 = new Talon(MotorPickup1);
-    //public Talon pickupMotor2 = new Talon(MotorPickup2);
-    
+        
     /** Shoulder **/
     public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
 
@@ -92,8 +92,8 @@ public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
     Joystick operatorStick = new Joystick(2);
-    Joystick launchpad =  new Joystick(4);
-    Joystick driverController = new Joystick(3);
+    Joystick launchpad =  new Joystick(3);
+    Joystick driverController = new Joystick(4);
     
     /** Pneumatics **/ 
     public Solenoid lifter = new Solenoid(0);
@@ -240,16 +240,16 @@ public class Robot extends IterativeRobot {
 				switch (autoMode)
 				{
 				    case 1:
-				    	auto = new AutoModeDriveTest(this);
+				    	auto = new AutoModeCanSlide(this);
 				    	break;
 				    case 2:
-				    	auto = new AutoModeDriveToTest(this);
+				    	auto = new AutoModeCanAndTote(this);
 				    	break;
 				    case 3:
-				    	auto = new AutoModePickupCan(this);
+				    	auto = new AutoModeDriveForward(this);
 				    	break;
 				    case 4:
-				    	auto = new AutoMode3Totes(this);
+				    	auto = new AutoModeToteTunr90java(this);
 				    	break;
 				    default:
 				    	auto = null;
@@ -313,7 +313,7 @@ public class Robot extends IterativeRobot {
 		} else {
 			lowArmsPickupState = false;
 		}
-		if (operatorStick.getRawButton(2)) {
+		lifterState = operatorStick.getRawButton(5);
 			highBoxPickupState = true;
 		} else {
 			highBoxPickupState = false;
@@ -334,12 +334,8 @@ public class Robot extends IterativeRobot {
 		} else {
 			lowArmsPickupState = false;
 		}
-		
-		if (operatorStick.getRawAxis(6) > 0) {     //There is a high chance this is wrong
-			highBoxPickupState = true;
 		} else {
 			highBoxPickupState = false;
-		}
 		*/
 		
 		/** Stacker Anti-Failure Logic **/
