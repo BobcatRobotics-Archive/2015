@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj.Victor;
  */
 public class Shoulder {
 
-	Talon motor;
+	//Talon motor;
+	Victor motor;
 	AnalogInput pot;
 
     // Initialize your subsystem here
     public Shoulder(int MotorChannel, int PotChannel) {
-    	motor = new Talon(MotorChannel);
+    	//motor = new Talon(MotorChannel);
+    	motor = new Victor(MotorChannel);
     	pot = new AnalogInput(PotChannel);
     }
     

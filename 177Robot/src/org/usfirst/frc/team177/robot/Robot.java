@@ -119,7 +119,7 @@ public class Robot extends IterativeRobot {
     private Thread tHTTP;
     
     //Logger
-    private Logger logger = new Logger();
+    //private Logger logger = new Logger();
     
     /* Time Tracking */
     long upStartTime = 0;
@@ -169,7 +169,7 @@ public class Robot extends IterativeRobot {
     	tHTTP.start();
     	
     	//Setup Logger
-    	logger.add(locator);
+    	//logger.add(locator);
 
     	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
@@ -193,19 +193,19 @@ public class Robot extends IterativeRobot {
     	if(auto != null) {
             auto.autoInit();
         }
-    	if(logger != null) {
+    	/*if(logger != null) {
     		logger.clear();
     		logger.add(locator);
     		logger.add(auto);
     		logger.start();
-    	}
+    	}*/
     }
     
     public void teleopInit()
     {
-    	if(logger != null) {
+    	/*if(logger != null) {
     		logger.stop();
-    	}
+    	}*/
     }
     
     /**
