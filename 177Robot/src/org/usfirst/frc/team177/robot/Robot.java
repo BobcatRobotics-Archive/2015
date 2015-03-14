@@ -270,6 +270,12 @@ public class Robot extends IterativeRobot {
             SmartDashboard.putString("Auto Mode", auto.getName()); 
         }
         SmartDashboard.putNumber("Auto Delay", autoDelay);
+        
+        SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
+		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
+		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
+		SmartDashboard.putNumber("Slide2 Encoder", locator.getSlide2EncoderDistance());
+		SmartDashboard.putNumber("gyro", locator.GetHeading());
    	}		
 
     /**
@@ -280,12 +286,11 @@ public class Robot extends IterativeRobot {
 		
 		if(armLiftStateLast == false && operatorStick.getRawButton(7) == true) {
 			armLiftStateNow = !armLiftStateNow;
-			lowArmsLift.set(armLiftStateNow);
-			armLiftStateLast = true;
-		} else {
-			armLiftStateLast = false;
-			 
-		 }
+			
+		}
+		armLiftStateLast = operatorStick.getRawButton(7);
+		lowArmsLift.set(armLiftStateNow);
+		
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		clawPneumatic.set(operatorStick.getRawButton(1)); 
@@ -361,6 +366,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
 		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
 		SmartDashboard.putNumber("Slide2 Encoder", locator.getSlide2EncoderDistance());
+		SmartDashboard.putNumber("gyro", locator.GetHeading());
 		
 		/** Drive Mode **/
 		double left = 0, right = 0, slide = 0;

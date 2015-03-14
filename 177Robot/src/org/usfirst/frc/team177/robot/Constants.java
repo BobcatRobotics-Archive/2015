@@ -5,10 +5,10 @@ import org.usfirst.frc.team177.lib.*;
 public class Constants extends ConstantsBase {
 
 	/** Shoulder Config **/
-	public static final Constant shoulderMinV = new Constant("shoulderMinV", 0.72);
-	public static final Constant shoulderMaxV = new Constant("shoulderMaxV", 2.98);
-	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 2.98);
-	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.72);	
+	public static final Constant shoulderMinV = new Constant("shoulderMinV", 0.5);
+	public static final Constant shoulderMaxV = new Constant("shoulderMaxV", 3.245);
+	public static final Constant shoulderLimitUp = new Constant("shoulderLimitUp", 3.245);
+	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.5);	
 	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 1);
 	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.1);
 	
@@ -38,6 +38,8 @@ public class Constants extends ConstantsBase {
     public static final Constant maxAcc = new Constant("maxAcc", 30.0);
     public static final Constant maxJerk = new Constant("maxJerk", 15.0 * 10);
     public static final Constant updateDt = new Constant("updateDT", 10);
+    
+    public static final Constant AutoDistance = new Constant("AutoDistance", -140);
     
     public static final Constant trajKp = new Constant("trajKp", 0.05);
     public static final Constant trajKi = new Constant("trajKi", 0.001);

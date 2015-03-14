@@ -42,14 +42,14 @@ public class AutoModeToteTunr90java extends AutoMode {
             	break;
             case 2:
             	robot.drive.tankDrive(-0.5,0.5);
-            	if(robot.locator.GetHeading() > 80 && robot.locator.GetHeading() < 92) {
+            	if(robot.locator.GetHeading() > 70 && robot.locator.GetHeading() < 92) { //lower number used to be 80
             		robot.drive.tankDrive(0.0,0.0);
             		StepCount++;
             	}
             	break;
             case 3:
             	robot.drive.tankDrive(-0.8,-0.8);
-            	if(robot.locator.GetY() < -180) {
+            	if(robot.locator.GetY() < Constants.AutoDistance.getDouble()) { //used to be 100
             		robot.drive.tankDrive(0.0,0.0);
             		StepCount++;
             	}
