@@ -54,7 +54,7 @@ public class AutoModeCanAndTote extends AutoMode {
                 }
             	break;
             case 3:
-            	robot.lifter.set(true);
+            	//robot.lifter.set(true);
             	StepCount++;
             	break;	
             case 4:

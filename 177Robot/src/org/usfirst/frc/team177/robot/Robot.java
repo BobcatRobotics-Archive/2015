@@ -13,7 +13,9 @@ import org.usfirst.frc.team177.auto.AutoModeToteTunr90java;
 import org.usfirst.frc.team177.lib.HTTPServer;
 import org.usfirst.frc.team177.lib.Locator;
 import org.usfirst.frc.team177.lib.Logger;
+import org.usfirst.frc.team177.lib.RangeFinder;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -72,16 +74,16 @@ public class Robot extends IterativeRobot {
     public Victor slideMotor1 = new Victor(MotorSlide1);
     public Victor slideMotor2 = new Victor(MotorSlide2);
     
-    public Victor pickupMotor1 = new Victor(MotorPickup1);
-    public Victor pickupMotor2 = new Victor(MotorPickup2);
+   // public Victor pickupMotor1 = new Victor(MotorPickup1);
+   // public Victor pickupMotor2 = new Victor(MotorPickup2);
         
     /** Shoulder **/
     public Shoulder shoulder = new Shoulder(MotorShoulderTilt, AIShoulderPot);
 
     
     /** Relays **/
-    Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
-    Relay clawMotor2 = new Relay(ClawMotor2, Relay.Direction.kBoth);    
+    public Relay clawMotor1 = new Relay(ClawMotor1, Relay.Direction.kBoth);
+    public Relay clawMotor2 = new Relay(ClawMotor2, Relay.Direction.kBoth);    
     
     /** Digital Inputs **/
     public DigitalInput toteSensor = new DigitalInput(Constants.DIOToteSensor.getInt());
@@ -95,13 +97,15 @@ public class Robot extends IterativeRobot {
     Joystick launchpad =  new Joystick(3);
     Joystick driverController = new Joystick(4);
     
+    AnalogInput range = new AnalogInput(3);
+    
     /** Pneumatics **/ 
-    public Solenoid lifter = new Solenoid(0);
-    public Solenoid lowArmsPickup = new Solenoid(1);
-    public Solenoid highBoxPickup = new Solenoid(2);
-    public Solenoid holder = new Solenoid(3);
-    public Solenoid clawPneumatic = new Solenoid(4);
-    public Solenoid lowArmsLift = new Solenoid(5);
+   //public Solenoid lifter = new Solenoid(0);
+   // public Solenoid lowArmsPickup = new Solenoid(1);
+   public Solenoid highBoxPickup = new Solenoid(2);
+   // public Solenoid holder = new Solenoid(3);
+   public Solenoid clawPneumatic = new Solenoid(1);
+   public Solenoid lowArmsLift = new Solenoid(5);
     
     /** State Variables **/
     boolean armLiftStateLast = false;
@@ -120,6 +124,10 @@ public class Robot extends IterativeRobot {
     
     //Logger
     //private Logger logger = new Logger();
+    
+    //Range finder
+    public RangeFinder rangeFinder = new RangeFinder();
+    private Thread tRangeFinder;
     
     /* Time Tracking */
     long upStartTime = 0;
@@ -170,6 +178,10 @@ public class Robot extends IterativeRobot {
     	
     	//Setup Logger
     	//logger.add(locator);
+    	
+    	//start rangefinder
+    	tRangeFinder = new Thread(rangeFinder);
+    	tRangeFinder.start();
 
     	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
@@ -251,6 +263,9 @@ public class Robot extends IterativeRobot {
 				    case 4:
 				    	auto = new AutoModeToteTunr90java(this);
 				    	break;
+				    case 5:
+				    	auto = new AutoMode3Totes(this);
+				    	break;	
 				    default:
 				    	auto = null;
 				    	break;
@@ -270,6 +285,8 @@ public class Robot extends IterativeRobot {
             SmartDashboard.putString("Auto Mode", auto.getName()); 
         }
         SmartDashboard.putNumber("Auto Delay", autoDelay);
+        
+        SmartDashboard.putNumber("Range", range.getVoltage());
    	}		
 
     /**
@@ -278,7 +295,7 @@ public class Robot extends IterativeRobot {
     	
 	public void teleopPeriodic() {
 		
-		if(armLiftStateLast == false && operatorStick.getRawButton(7) == true) {
+		/*if(armLiftStateLast == false && operatorStick.getRawButton(7) == true) {
 			armLiftStateNow = !armLiftStateNow;
 			lowArmsLift.set(armLiftStateNow);
 			armLiftStateLast = true;
@@ -286,9 +303,10 @@ public class Robot extends IterativeRobot {
 			armLiftStateLast = false;
 			 
 		 }
+		 */
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
-		clawPneumatic.set(operatorStick.getRawButton(1)); 
+		clawPneumatic.set(operatorStick.getRawButton(2)); 
 		
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
@@ -303,7 +321,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		/** Stacking Controller bindings **/
-		pickupMotor1.set(operatorStick.getRawAxis(3));
+		/*pickupMotor1.set(operatorStick.getRawAxis(3));
 		pickupMotor2.set(operatorStick.getRawAxis(3));
 		//pickupMotor2.set(operatorStick.getRawAxis(3));
 		
@@ -317,9 +335,9 @@ public class Robot extends IterativeRobot {
 			highBoxPickupState = true;
 		} else {
 			highBoxPickupState = false;
-		}
+		}*/
 		
-		if (operatorStick.getRawButton(5)) {
+		/*if (operatorStick.getRawButton(5)) {
 			holder.set(false);
 			lifter.set(false);
 			upStartTime = System.currentTimeMillis();
@@ -328,7 +346,7 @@ public class Robot extends IterativeRobot {
 			if (System.currentTimeMillis() - upStartTime > Constants.holderTimeOut.getDouble()) {
 				holder.set(true);
 			}
-		}
+		}*/
 		/*if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
 			lowArmsPickupState = true;
 		} else {
@@ -340,8 +358,8 @@ public class Robot extends IterativeRobot {
 		
 		/** Stacker Anti-Failure Logic **/
 		
-		lowArmsPickup.set(lowArmsPickupState);
-		highBoxPickup.set(highBoxPickupState);
+		//lowArmsPickup.set(lowArmsPickupState);
+		//highBoxPickup.set(highBoxPickupState);
 		/*if(!lowArmsPickupState) {
 		 	highBoxPickup.set(highBoxPickupState);
 		} else {
@@ -361,6 +379,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
 		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
 		SmartDashboard.putNumber("Slide2 Encoder", locator.getSlide2EncoderDistance());
+		
+		SmartDashboard.putNumber("Range", range.getVoltage());
 		
 		/** Drive Mode **/
 		double left = 0, right = 0, slide = 0;
@@ -421,7 +441,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//If the shift switch is set reverse the orientation of the robot
-		if(rightStick.getRawButton(3))
+		if(!rightStick.getRawButton(3))
 		{
 			double temp = left;
 			left = -1.0 * right;

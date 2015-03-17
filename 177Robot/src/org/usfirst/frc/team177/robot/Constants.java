@@ -23,9 +23,14 @@ public class Constants extends ConstantsBase {
 	public static final Constant DIOSlide2EncoderB = new Constant("DIOSlide2EncoderB", 7);
 	
 	/** Encoder Calibration */
-	public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 12.57/128);
+	/*public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 12.57/128);
 	public static final Constant RightEncoderDPP = new Constant("RightEncoderDPP", 12.57/128);
-	public static final Constant SlideEncoderDPP = new Constant("SlideEncoderDPP", 12.57/128);
+	public static final Constant SlideEncoderDPP = new Constant("SlideEncoderDPP", 12.57/128);*/
+	
+	//Followers
+	public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 8.64/128);
+	public static final Constant RightEncoderDPP = new Constant("RightEncoderDPP", 12.57/128);
+	public static final Constant SlideEncoderDPP = new Constant("SlideEncoderDPP", 8.64/128);
 	
 	/** Digital Inputs **/
 	public static final Constant DIOToteSensor = new Constant("DIOToteSensor", 8);

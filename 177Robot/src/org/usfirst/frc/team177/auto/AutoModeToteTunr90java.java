@@ -31,7 +31,7 @@ public class AutoModeToteTunr90java extends AutoMode {
     public void autoPeriodic() {
         switch(StepCount) {
             case 0:
-            	robot.lifter.set(true);
+            	//robot.lifter.set(true);
             	lastMs = System.currentTimeMillis();
             	StepCount++;
             	break;

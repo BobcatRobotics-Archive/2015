@@ -133,8 +133,9 @@ public class Locator implements Logable {
                 
                 /* Average the two encoder values */
                 /* TODO - posiably add error checking to detect a failed encoder and ignore it */
-                distance = ((left - lastLeft) + (right - lastRight)) / 2.0;
-                
+                //distance = ((left - lastLeft) + (right - lastRight)) / 2.0;
+                distance = (left - lastLeft); 
+                		
                 heading = headingGyro.GetHeading();
 
                 /* Do fancy trig stuff */
