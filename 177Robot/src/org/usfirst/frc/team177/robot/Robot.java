@@ -286,7 +286,11 @@ public class Robot extends IterativeRobot {
         }
         SmartDashboard.putNumber("Auto Delay", autoDelay);
         
-        SmartDashboard.putNumber("Range", range.getVoltage());
+        SmartDashboard.putNumber("leftEncoder", locator.getLeftEncoderDistance());
+		SmartDashboard.putNumber("Right Encoder", locator.getRightEncoderDistance());
+		SmartDashboard.putNumber("Slide1 Encoder", locator.getSlide1EncoderDistance());
+		SmartDashboard.putNumber("Slide2 Encoder", locator.getSlide2EncoderDistance());
+		SmartDashboard.putNumber("gyro", locator.GetHeading());
    	}		
 
     /**
@@ -306,7 +310,7 @@ public class Robot extends IterativeRobot {
 		 */
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
-		clawPneumatic.set(operatorStick.getRawButton(2)); 
+		clawPneumatic.set(operatorStick.getRawButton(1)); 
 		
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {

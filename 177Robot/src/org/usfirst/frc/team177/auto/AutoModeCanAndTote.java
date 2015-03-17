@@ -67,10 +67,23 @@ public class AutoModeCanAndTote extends AutoMode {
             case 5:
             	robot.slideMotor1.set(1);
             	robot.slideMotor2.set(-1);
-            	if(robot.locator.GetY() < -112) {
+            	if(robot.locator.GetY() < Constants.AutoDistance.getDouble()) {  //used to be 112
+            		robot.slideMotor1.set(-1);
+                	robot.slideMotor2.set(1);
+                	StepCount++;
+                	LastMS = System.currentTimeMillis();
+            	}
+            	break;
+            case 6:
+            	robot.slideMotor1.set(-1);
+            	robot.slideMotor2.set(1);
+            	if (System.currentTimeMillis() - LastMS > 200)
+            	{
             		robot.slideMotor1.set(0);
                 	robot.slideMotor2.set(0);
+                	StepCount++;
             	}
+                break;            	
             default:
                 robot.drive.tankDrive(0.0,0.0);
         }
