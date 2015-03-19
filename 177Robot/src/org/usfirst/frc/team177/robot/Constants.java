@@ -11,6 +11,9 @@ public class Constants extends ConstantsBase {
 	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.5);	
 	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 1);
 	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.1);
+	public static final Constant shoulderPosition1 = new Constant("shoulderPosition1", 1.5); //Magic Number Needs to be calibrated
+	public static final Constant shoulderPosition2 = new Constant("shoulderPosition2", 2.5);  //Magic Number Needs to be calibrated
+	public static final Constant shoulderPosition3 = new Constant("shoulderPosition3", 3);  //Magic Number Needs to be calibrated
 	
 	/** Encoders **/
 	public static final Constant DIOLeftEncoderA = new Constant("DIOLeftEncoderA", 0);

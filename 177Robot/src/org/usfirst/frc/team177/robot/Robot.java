@@ -298,20 +298,33 @@ public class Robot extends IterativeRobot {
      */
     	
 	public void teleopPeriodic() {
-		
-		/*if(armLiftStateLast == false && operatorStick.getRawButton(7) == true) {
-			armLiftStateNow = !armLiftStateNow;
-			lowArmsLift.set(armLiftStateNow);
-			armLiftStateLast = true;
-		} else {
-			armLiftStateLast = false;
-			 
-		 }
-		 */
 		/** Shoulder Tilt **/
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
-		clawPneumatic.set(operatorStick.getRawButton(1)); 
-		
+		clawPneumatic.set(operatorStick.getRawButton(5));
+
+		/** Shoulder Positioner **/ //Please someone refactor this for the good of us all
+		if (operatorStick.getRawButton(1)) {
+			if(shoulder.getPosition() < (Constants.shoulderPosition1.getDouble() - Constants.shoulderDeadband.getDouble())) {
+				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
+					shoulder.set(-1);
+				}
+			} else if (shoulder.getPosition() > Constants.shoulderPosition1.getDouble() + Constants.shoulderDeadband.getDouble()) {
+				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
+					shoulder.set(1);
+				}
+			}
+		}
+		if (operatorStick.getRawButton(2)) {
+			if(shoulder.getPosition() < (Constants.shoulderPosition2.getDouble() - Constants.shoulderDeadband.getDouble())) {
+				while (shoulder.getPosition() < Constants.shoulderPosition2.getDouble()) {
+					shoulder.set(-1);
+				}
+			} else if (shoulder.getPosition() > Constants.shoulderPosition2.getDouble() + Constants.shoulderDeadband.getDouble()) {
+				while (shoulder.getPosition() < Constants.shoulderPosition2.getDouble()) {
+					shoulder.set(1);
+				}
+			}
+		}
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
 			clawMotor1.set(Relay.Value.kForward);
@@ -324,52 +337,6 @@ public class Robot extends IterativeRobot {
 			clawMotor2.set(Relay.Value.kOff);
 		}
 		
-		/** Stacking Controller bindings **/
-		/*pickupMotor1.set(operatorStick.getRawAxis(3));
-		pickupMotor2.set(operatorStick.getRawAxis(3));
-		//pickupMotor2.set(operatorStick.getRawAxis(3));
-		
-		
-		if (operatorStick.getRawButton(3)) {
-			lowArmsPickupState = true;
-		} else {
-			lowArmsPickupState = false;
-		}
-        if (operatorStick.getRawButton(2)) {
-			highBoxPickupState = true;
-		} else {
-			highBoxPickupState = false;
-		}*/
-		
-		/*if (operatorStick.getRawButton(5)) {
-			holder.set(false);
-			lifter.set(false);
-			upStartTime = System.currentTimeMillis();
-		} else {
-			lifter.set(true);
-			if (System.currentTimeMillis() - upStartTime > Constants.holderTimeOut.getDouble()) {
-				holder.set(true);
-			}
-		}*/
-		/*if (operatorStick.getRawAxis(5) > 0) {     //There is a high chance this is wrong
-			lowArmsPickupState = true;
-		} else {
-			lowArmsPickupState = false;
-		}
-		} else {
-			highBoxPickupState = false;
-		*/
-		
-		/** Stacker Anti-Failure Logic **/
-		
-		//lowArmsPickup.set(lowArmsPickupState);
-		//highBoxPickup.set(highBoxPickupState);
-		/*if(!lowArmsPickupState) {
-		 	highBoxPickup.set(highBoxPickupState);
-		} else {
-			highBoxPickup.set(false);
-		}
-		*/
 		if(operatorStick.getRawButton(10)) {
 			locator.Reset();
 		}
