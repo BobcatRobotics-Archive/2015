@@ -302,15 +302,15 @@ public class Robot extends IterativeRobot {
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		clawPneumatic.set(operatorStick.getRawButton(5));
 
-		/** Shoulder Positioner **/ //Please someone refactor this for the good of us all
+		/** Shoulder Positioner **/ 
 		if (operatorStick.getRawButton(1)) {
 			if(shoulder.getPosition() < (Constants.shoulderPosition1.getDouble() - Constants.shoulderDeadband.getDouble())) {
 				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
-					shoulder.set(-1);
+					shoulder.set(-1); //up
 				}
 			} else if (shoulder.getPosition() > Constants.shoulderPosition1.getDouble() + Constants.shoulderDeadband.getDouble()) {
 				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
-					shoulder.set(1);
+					shoulder.set(1); //down
 				}
 			}
 		}
