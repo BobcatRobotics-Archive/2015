@@ -32,7 +32,7 @@ public class AutoModeCanAndTote extends AutoMode {
     public void autoPeriodic() {
         switch(StepCount) {
             case 0:
-            	robot.highBoxPickup.set(true);
+            	//robot.highBoxPickup.set(true);
             	StepCount++;
             	break;
             case 1:
@@ -48,7 +48,7 @@ public class AutoModeCanAndTote extends AutoMode {
                 }
                 break;
             case 2:
-            	robot.highBoxPickup.set(false);
+            	//robot.highBoxPickup.set(false);
             	if (System.currentTimeMillis() - LastMS > 500) {
             		StepCount++;
                 }

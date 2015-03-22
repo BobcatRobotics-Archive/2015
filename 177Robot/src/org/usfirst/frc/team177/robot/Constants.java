@@ -11,8 +11,8 @@ public class Constants extends ConstantsBase {
 	public static final Constant shoulderLimitDown = new Constant("shoulderLimitDown", 0.5);	
 	public static final Constant shoulderEnableLimits = new Constant("shoulderEnableLimits", 1);
 	public static final Constant shoulderDeadband = new Constant("shoulderDeadband", 0.1);
-	public static final Constant shoulderPosition1 = new Constant("shoulderPosition1", 1.5); //Magic Number Needs to be calibrated
-	public static final Constant shoulderPosition2 = new Constant("shoulderPosition2", 2.5);  //Magic Number Needs to be calibrated
+	public static final Constant shoulderPosition1 = new Constant("shoulderPosition1", 0.662); 
+	public static final Constant shoulderPosition2 = new Constant("shoulderPosition2", 1.207);  
 	
 	/** Encoders **/
 	public static final Constant DIOLeftEncoderA = new Constant("DIOLeftEncoderA", 0);
@@ -23,6 +23,8 @@ public class Constants extends ConstantsBase {
 	public static final Constant DIOSlide1EncoderB = new Constant("DIOSlide1EncoderB", 5);
 	public static final Constant DIOSlide2EncoderA = new Constant("DIOSlide2EncoderA", 6);
 	public static final Constant DIOSlide2EncoderB = new Constant("DIOSlide2EncoderB", 7);
+	public static final Constant DIOCanPickupLimitLeft = new Constant("DIOCanPickupLimitLeft", 8);
+	public static final Constant DIOCanPickupLimitRight = new Constant("DIOCanPickupLimitRight", 9);
 	
 	/** Encoder Calibration */
 	/*public static final Constant LeftEncoderDPP = new Constant("LeftEncoderDPP", 12.57/128);

@@ -48,8 +48,8 @@ public class Robot extends IterativeRobot {
     private static final int MotorSlide1 = 6;
     private static final int MotorSlide2 = 7;
   
-    private static final int MotorPickup1 = 5; 
-    private static final int MotorPickup2 = 9;
+    private static final int MotorCanGrabLeft = 5;
+    private static final int MotorCanGrabRight = 9;
     
     private static final int MotorShoulderTilt = 8; 
     
@@ -100,12 +100,9 @@ public class Robot extends IterativeRobot {
     AnalogInput range = new AnalogInput(3);
     
     /** Pneumatics **/ 
-   //public Solenoid lifter = new Solenoid(0);
-   // public Solenoid lowArmsPickup = new Solenoid(1);
-   public Solenoid highBoxPickup = new Solenoid(2);
-   // public Solenoid holder = new Solenoid(3);
-   public Solenoid clawPneumatic = new Solenoid(1);
-   public Solenoid lowArmsLift = new Solenoid(5);
+   public Solenoid clawPneumatic = new Solenoid(2);
+   public Solenoid canGrabLeft = new Solenoid(1);
+   public Solenoid canGrabRight = new Solenoid(3);
     
     /** State Variables **/
     boolean armLiftStateLast = false;
@@ -299,32 +296,30 @@ public class Robot extends IterativeRobot {
     	
 	public void teleopPeriodic() {
 		/** Shoulder Tilt **/
+		boolean shoulder1TooLow = shoulder.getRawPosition() < (Constants.shoulderPosition1.getDouble() - Constants.shoulderDeadband.getDouble());
+		boolean shoulder1TooHigh = shoulder.getRawPosition() > (Constants.shoulderPosition1.getDouble() + Constants.shoulderDeadband.getDouble());
+		boolean shoulder2TooLow = shoulder.getRawPosition() < (Constants.shoulderPosition2.getDouble() - Constants.shoulderDeadband.getDouble());
+		boolean shoulder2TooHigh = shoulder.getRawPosition() > Constants.shoulderPosition2.getDouble() + Constants.shoulderDeadband.getDouble();
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		clawPneumatic.set(operatorStick.getRawButton(5));
 
 		/** Shoulder Positioner **/ 
-		if (operatorStick.getRawButton(1)) {
-			if(shoulder.getPosition() < (Constants.shoulderPosition1.getDouble() - Constants.shoulderDeadband.getDouble())) {
-				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
-					shoulder.set(-1); //up
-				}
-			} else if (shoulder.getPosition() > Constants.shoulderPosition1.getDouble() + Constants.shoulderDeadband.getDouble()) {
-				while (shoulder.getPosition() < Constants.shoulderPosition1.getDouble()) {
-					shoulder.set(1); //down
-				}
-			}
+		/*while (operatorStick.getRawButton(1) && (shoulder1TooLow)) {
+			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+			shoulder.set(1); //up
 		}
-		if (operatorStick.getRawButton(2)) {
-			if(shoulder.getPosition() < (Constants.shoulderPosition2.getDouble() - Constants.shoulderDeadband.getDouble())) {
-				while (shoulder.getPosition() < Constants.shoulderPosition2.getDouble()) {
-					shoulder.set(-1);
-				}
-			} else if (shoulder.getPosition() > Constants.shoulderPosition2.getDouble() + Constants.shoulderDeadband.getDouble()) {
-				while (shoulder.getPosition() < Constants.shoulderPosition2.getDouble()) {
-					shoulder.set(1);
-				}
-			}
+		while (operatorStick.getRawButton(1) && (shoulder1TooHigh)) {
+			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+			shoulder.set(-1); //down
 		}
+		while (operatorStick.getRawButton(2) && (shoulder2TooLow)) {
+			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+			shoulder.set(1); //up
+		}
+		while (operatorStick.getRawButton(2) && (shoulder2TooHigh)) {
+			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
+			shoulder.set(-1); //down
+		} */
 		/**Window Motor Control **/
 		if(operatorStick.getRawButton(6)) {
 			clawMotor1.set(Relay.Value.kForward);
