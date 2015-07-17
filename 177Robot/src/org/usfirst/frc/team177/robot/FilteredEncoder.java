@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.Timer;
  *
  * @author schroed
  */
-public class FilteredEncoder extends Encoder {
+public class FilteredEncoder extends Encoder 
+{
     
     private final static int AverageCount = 5;
     private double rateRunningAverage[] = new double[AverageCount];
@@ -32,25 +33,26 @@ public class FilteredEncoder extends Encoder {
      * @param aChannel The a channel digital input channel.
      * @param bChannel The b channel digital input channel.
      */
-    public FilteredEncoder(final int aChannel, final int bChannel) {
+    public FilteredEncoder(final int aChannel, final int bChannel) 
+	{
         super(aChannel, bChannel, false);
         
-         for(int i = 0; i < AverageCount; i++) {            
+         for(int i = 0; i < AverageCount; i++) 
+		 {            
             rateRunningAverage[i] = 0;
             distanceRunningAverage[i] = 0;
         }
-        
         DataStore = new double[StorageSize];
     }
     
     public FilteredEncoder(final int aChannel, final int bChannel, boolean reverseDirection, final EncodingType encodingType) {
         super(aChannel, bChannel, false, encodingType);
         
-        for(int i = 0; i < AverageCount; i++) {            
+        for(int i = 0; i < AverageCount; i++) 
+		{            
             rateRunningAverage[i] = 0;
             distanceRunningAverage[i] = 0;
         }
-        
         DataStore = new double[StorageSize];
     }
     
@@ -61,17 +63,20 @@ public class FilteredEncoder extends Encoder {
      *
      * @return The filtered rate of the encoder.
      */
-     public double getRate() {        
+     public double getRate() 
+	 {        
         double average = 0;
         rateRunningAverage[rateAverageIndex] = super.getRate();
         
-        if(DataIndex < StorageSize) {
+        if(DataIndex < StorageSize) 
+		{
             DataStore[DataIndex++] = rateRunningAverage[rateAverageIndex];
         } 
         
         rateAverageIndex = (rateAverageIndex+1)%AverageCount;
         
-        for (int i = 0; i < AverageCount; i++) {
+        for (int i = 0; i < AverageCount; i++) 
+		{
             average += rateRunningAverage[i];
         }
         lastRate = average / AverageCount;
@@ -79,19 +84,23 @@ public class FilteredEncoder extends Encoder {
         return lastRate;
     }
     
-    public void dumpStoredData() {
-        for(int i = 0; i < StorageSize; i++) {
+    public void dumpStoredData() 
+	{
+        for(int i = 0; i < StorageSize; i++) 
+		{
             System.out.print(DataStore[i]+ ",");
         }
         System.out.println("");
     }
     
-    public void resetStoredData() {
+    public void resetStoredData() 
+	{
         DataIndex = 0;
     }
      
      
-     public double getLastRate() {
+     public double getLastRate() 
+	 {
          return lastRate;
      }
     
@@ -105,7 +114,8 @@ public class FilteredEncoder extends Encoder {
      */
     private double lastDistance;
     private double lastTime;
-    public double getRateFromDistance() {
+    public double getRateFromDistance() 
+	{
         double distance = getDistance();
         double time = Timer.getFPGATimestamp();
         double deltaDist = lastDistance - distance;
@@ -120,15 +130,16 @@ public class FilteredEncoder extends Encoder {
      *
      * @return The distance driven since the last reset as scaled by the value from setDistancePerPulse().
      */
-     public double getDistance() {
+     public double getDistance() 
+	 {
         double average = 0;
         distanceRunningAverage[distanceAverageIndex] = super.getDistance();
         distanceAverageIndex = (distanceAverageIndex+1)%AverageCount;
         
-        for (int i = 0; i < AverageCount; i++) {
+        for (int i = 0; i < AverageCount; i++) 
+		{
             average += distanceRunningAverage[i];
         }
         return average / AverageCount;          
      }   
-   
 }
