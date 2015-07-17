@@ -35,7 +35,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot 
+{
 	
 	/** IO Definitions **/
     /** Motors **/
@@ -136,23 +137,27 @@ public class Robot extends IterativeRobot {
     boolean highBoxPickupState;
     boolean lifterState;
     
-    enum driveModeEnum {
+    enum driveModeEnum 
+	{
 		TankJoyStickDrive,
 		SlideJoyStickDrive,
 		TankControllerDrive,
 		SlideControllerDrive
 	};
     
-    private class DriveMode {
+    private class DriveMode 
+	{
         
     	
     	private driveModeEnum mode;
     	
-    	DriveMode(driveModeEnum mode) {
+    	DriveMode(driveModeEnum mode) 
+		{
     		this.mode = mode;
     	}
     	
-    	public driveModeEnum getMode() {
+    	public driveModeEnum getMode() 
+		{
     		return mode;
     	}
     }
@@ -161,7 +166,8 @@ public class Robot extends IterativeRobot {
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
-    public void robotInit() {
+    public void robotInit() 
+	{
        /* drive.setInvertedMotor(RobotDrive6.MotorType.kFrontLeft, true);
         drive.setInvertedMotor(RobotDrive6.MotorType.kMidLeft, true);
         drive.setInvertedMotor(RobotDrive6.MotorType.kRearLeft, true);
@@ -182,9 +188,9 @@ public class Robot extends IterativeRobot {
 
     	/**Drive Mode Chooser **/
     	driveModeChooser = new SendableChooser();
-    	for( driveModeEnum dm : driveModeEnum.values()) {
-    		driveModeChooser.addObject(dm.toString(), new DriveMode(dm));
-    		
+    	for( driveModeEnum dm : driveModeEnum.values()) 
+		{
+    		driveModeChooser.addObject(dm.toString(), new DriveMode(dm));	
     	}
     	SmartDashboard.putData("DriveMode", driveModeChooser);
     	
@@ -199,7 +205,8 @@ public class Robot extends IterativeRobot {
     
     public void autonomousInit()
     {
-    	if(auto != null) {
+    	if(auto != null) 
+		{
             auto.autoInit();
         }
     	/*if(logger != null) {
@@ -212,7 +219,8 @@ public class Robot extends IterativeRobot {
     
     public void teleopInit()
     {
-    	/*if(logger != null) {
+    	/*if(logger != null) 
+		{
     		logger.stop();
     	}*/
     }
@@ -220,26 +228,29 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during autonomous
      */
-    public void autonomousPeriodic() {
-        if(auto != null /*&& m_ds.getMatchTime() > autoDelay*/) {
+    public void autonomousPeriodic() 
+	{
+        if(auto != null /*&& m_ds.getMatchTime() > autoDelay*/) 
+		{
             auto.autoPeriodic();        
-        } else {
+        } else 
+		{
             drive.tankDrive(0, 0);
         }
     }
     
   
     
-    public void disabledPeriodic() {
-    	
+    public void disabledPeriodic() 
+	{	
     	SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
     	SmartDashboard.putNumber("Shoulder Position(%)", shoulder.getPosition()*100.0);
     	DriveMode ActiveDriveMode = (DriveMode) driveModeChooser.getSelected();
 		SmartDashboard.putString("ActiveDriveMode", ActiveDriveMode.getMode().toString());
 		SmartDashboard.putBoolean("Tote Sensor", toteSensor.get());
-		
-		
-		try {
+			
+		try 
+		{
     		int new_automode = (launchpad.getRawButton(1) ? 0 : 4) + (launchpad.getRawButton(2) ? 0 : 2) + (launchpad.getRawButton(3) ? 0 : 1);
     		if (new_automode != autoMode)
     		{
@@ -267,18 +278,20 @@ public class Robot extends IterativeRobot {
 				    	auto = null;
 				    	break;
 			    } 
-				
-				
     		}
             autoDelay = 0; //(inputs.getX() + 1.0f)*10.0f;  //-1 to 1 gives you a range 0 - 20
-        } catch (Exception e) {
+        } 
+		catch (Exception e) 
+		{
             System.out.println("Error in disabledPeriodic: " + e);
         }
 
         //Send the selected mode to the driver station
-        if(auto == null) {
+        if(auto == null) 
+		{
             SmartDashboard.putString("Auto Mode", "Do Nothing"); 
-        } else {
+        } else 
+		{
             SmartDashboard.putString("Auto Mode", auto.getName()); 
         }
         SmartDashboard.putNumber("Auto Delay", autoDelay);
@@ -294,7 +307,8 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     	
-	public void teleopPeriodic() {
+	public void teleopPeriodic() 
+	{
 		/** Shoulder Tilt **/
 		boolean shoulder1TooLow = shoulder.getRawPosition() < (Constants.shoulderPosition1.getDouble() - Constants.shoulderDeadband.getDouble());
 		boolean shoulder1TooHigh = shoulder.getRawPosition() > (Constants.shoulderPosition1.getDouble() + Constants.shoulderDeadband.getDouble());
@@ -302,37 +316,25 @@ public class Robot extends IterativeRobot {
 		boolean shoulder2TooHigh = shoulder.getRawPosition() > Constants.shoulderPosition2.getDouble() + Constants.shoulderDeadband.getDouble();
 		shoulder.set(operatorStick.getRawAxis(1) * -1); 
 		clawPneumatic.set(operatorStick.getRawButton(5));
-
-		/** Shoulder Positioner **/ 
-		/*while (operatorStick.getRawButton(1) && (shoulder1TooLow)) {
-			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-			shoulder.set(1); //up
-		}
-		while (operatorStick.getRawButton(1) && (shoulder1TooHigh)) {
-			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-			shoulder.set(-1); //down
-		}
-		while (operatorStick.getRawButton(2) && (shoulder2TooLow)) {
-			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-			shoulder.set(1); //up
-		}
-		while (operatorStick.getRawButton(2) && (shoulder2TooHigh)) {
-			SmartDashboard.putNumber("Shoulder Position(v)", shoulder.getRawPosition());
-			shoulder.set(-1); //down
-		} */
+		
 		/**Window Motor Control **/
-		if(operatorStick.getRawButton(6)) {
+		if(operatorStick.getRawButton(6)) 
+		{
 			clawMotor1.set(Relay.Value.kForward);
 			clawMotor2.set(Relay.Value.kForward);
-		} else if(operatorStick.getRawButton(8)) {
+		} 
+		else if(operatorStick.getRawButton(8)) 
+		{
 			clawMotor1.set(Relay.Value.kReverse);
 			clawMotor2.set(Relay.Value.kReverse);
-		} else {
+		} 
+		else 
+		{
 			clawMotor1.set(Relay.Value.kOff);
 			clawMotor2.set(Relay.Value.kOff);
 		}
-		
-		if(operatorStick.getRawButton(10)) {
+		if(operatorStick.getRawButton(10)) 
+		{
 			locator.Reset();
 		}
 		
@@ -364,14 +366,19 @@ public class Robot extends IterativeRobot {
 				slide = driverController.getRawAxis(0);
 				left = driverController.getRawAxis(1)  - driverController.getRawAxis(4);
 	    		right = driverController.getRawAxis(1) + driverController.getRawAxis(4);
-	    		if (left > right) {
-	    			if (left > 1) {
+	    		if (left > right) 
+				{
+	    			if (left > 1) 
+					{
 	    				double scale = 1 / left;
 	    				left = scale * left;
 	    				right = scale * right;
 	    			} 
-	    		} else {
-	    			if (right > 1) {
+	    		} 
+				else 
+				{
+	    			if (right > 1) 
+					{
 	    				double scale = 1 / right;
 	    				left = scale * left;
 	    				right = scale * right;
@@ -382,20 +389,24 @@ public class Robot extends IterativeRobot {
 				slide = leftStick.getRawAxis(axisX);				
 				left = leftStick.getRawAxis(axisY)  - rightStick.getRawAxis(axisX);
 				right = leftStick.getRawAxis(axisY) + rightStick.getRawAxis(axisX);
-				if (left > right) {
-					if (left > 1) {
+				if (left > right) 
+				{
+					if (left > 1) 
+					{
 						double scale = 1 / left;
 						left = scale * left;
 						right = scale * right;
 					} 
-				} else {
-					if (right > 1) {
+				} 
+				else 
+				{
+					if (right > 1) 
+					{
 						double scale = 1 / right;
 						left = scale * left;
 						right = scale * right;
 					}
 				}
-				
 				break;
 			case TankControllerDrive:
 				left = driverController.getRawAxis(1);
@@ -405,7 +416,6 @@ public class Robot extends IterativeRobot {
 			default:
 				break;
 		}
-		
 		//If the shift switch is set reverse the orientation of the robot
 		if(!rightStick.getRawButton(3))
 		{
@@ -423,9 +433,8 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during test mode
      */
-    	
-    public void testPeriodic() {
+    public void testPeriodic() 
+	{
     	LiveWindow.run();
     }
-    
 }
